@@ -7,7 +7,7 @@ import cookieParser from "cookie-parser";
 import "dotenv/config";
 console.log(process.env.MONGODB_URI);
 import { errorHandler, notFound } from "./middlewares/errorHandler.js";
-import { apiLimiter, authLimiter } from "./utils/rateLimiting.js";
+
 
 // Import routes
 import authRoutes from "./routes/auth.routes.js";
@@ -18,14 +18,12 @@ import { cameraRoter } from "./routes/camera.routes.js";
 import { guardianRouter } from "./routes/guardian.routes.js";
 import { dashboardRouter } from "./routes/dashboard.routes.js";
 import { streamRouter } from "./routes/stream.routes.js";
-import { guardianRoute } from "./routes/guardian.js";
+// import { guardianRoute } from "./routes/guardian.js";
 // import { sanitizeInputs } from "./middlewares/sanitize.js";
 
 // Load env vars
 dotenv.config();
-
 const app = express();
-
 // Body parser - increased limit for file uploads/camera data
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
@@ -55,7 +53,7 @@ app.use(
 // Enable CORS
 app.use(
   cors({
-    origin: process.env.CORS_ORIGIN || "http://localhost:5173/",
+    origin: process.env.CORS_ORIGIN ,
     credentials: true, // Important for cookies
     optionsSuccessStatus: 200,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
@@ -86,7 +84,7 @@ app.use("/api/categories", categoryRouter);
 app.use("/api/sub-categories", subCategoryRouter);
 app.use("/api/nested-subcategories", nestedSubCategoryRoutes);
 app.use("/api/cameras", cameraRoter);
-app.use("/api/guardian", guardianRoute);
+// app.use("/api/guardian", guardianRoute);
 app.use("/api/guardians", guardianRouter);
 app.use("/api/dashboard", dashboardRouter);
 app.use("/api/streams", streamRouter);

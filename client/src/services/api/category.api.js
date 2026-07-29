@@ -1,6 +1,4 @@
 import api from "../api";
-
-
 class CategoryApi {
   /**
    * Get all categories with pagination and filters

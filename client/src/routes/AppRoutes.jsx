@@ -6,6 +6,7 @@ import AdminLayout from "@/components/layout/AdminLayout";
 import AddGuardian from "@/adminDashboard/guardian/AddGuardian";
 import { CreateAccount } from "@/pages/CreateAccount";
 import GuardianDetails from "@/adminDashboard/guardian/GuardianDetails";
+import { Loader2 } from "lucide-react";
 
 // Lazy imports
 const AdminDashboard = lazy(() => import("../pages/AdminDashboard"));
@@ -27,7 +28,16 @@ const ActivityLogs = lazy(() => import("../pages/ActivityLogs"));
 
 const AppRoutes = () => {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense
+      fallback={
+        <div className="flex min-h-[60vh] items-center justify-center">
+          <div className="flex flex-col items-center gap-3">
+            <Loader2 className="h-10 w-10 animate-spin text-blue-600" />
+            <p className="text-sm text-gray-500">Loading, please wait...</p>
+          </div>
+        </div>
+      }
+    >
       <Routes>
         {/* ================= PUBLIC ROUTES ================= */}
         <Route path="/" element={<LandingPage />} />
@@ -92,7 +102,7 @@ const AppRoutes = () => {
           }
         />
 
-          <Route
+        <Route
           path="/dashboard/guardian/:id"
           element={
             <ProtectedRoute>
@@ -136,7 +146,7 @@ const AppRoutes = () => {
           path="/parent-portal"
           element={
             // <ProtectedRoute allowedType="parent">
-              <ParentPortal />
+            <ParentPortal />
             // </ProtectedRoute>
           }
         />

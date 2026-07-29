@@ -1,7 +1,10 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_APP_API_URL || "http://localhost:5000",
+  baseURL:
+    import.meta.env.VITE_APP_API_URL ||
+    // "http://localhost:5000",
+    "https://cctv-monitoring-dashboard-server.onrender.com",
   withCredentials: true,
   headers: {
     "Content-Type": "application/json",
@@ -19,14 +22,15 @@ api.interceptors.response.use(
     const originalRequest = error.config;
 
     if (error.response?.status === 401 && !originalRequest._retry) {
-
       if (refreshAttempts >= MAX_REFRESH_ATTEMPTS) {
         // ❌ Stop trying after 2 attempts
         window.location.href = "/admin-login";
+        console.log(error);
         return Promise.reject(error);
       }
 
       if (isRefreshing) {
+        console.log(error);
         return Promise.reject(error);
       }
 
@@ -43,6 +47,7 @@ api.interceptors.response.use(
 
         return api(originalRequest);
       } catch (refreshError) {
+        console.log(refreshError);
         isRefreshing = false;
 
         if (refreshAttempts >= MAX_REFRESH_ATTEMPTS) {
@@ -52,9 +57,9 @@ api.interceptors.response.use(
         return Promise.reject(refreshError);
       }
     }
-
+    console.log(error);
     return Promise.reject(error);
-  }
+  },
 );
 
 export default api;

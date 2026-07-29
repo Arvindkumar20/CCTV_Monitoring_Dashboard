@@ -73,12 +73,7 @@
 //   );
 // };
 
-import React, {
-  createContext,
-  useEffect,
-  useState,
-  useRef,
-} from "react";
+import React, { createContext, useEffect, useState, useRef } from "react";
 import api from "../services/api";
 
 export const AuthContext = createContext();
@@ -92,6 +87,7 @@ export const AuthProvider = ({ children }) => {
   // Fetch profile
   const fetchProfile = async () => {
     const res = await api.get("/api/auth/profile");
+    console.log(res);
     setUser(res.data.data);
   };
 
@@ -106,7 +102,7 @@ export const AuthProvider = ({ children }) => {
         await api.post("/api/auth/refresh-token");
         await fetchProfile();
       } catch (err) {
-        console.log(err)
+        console.log(err);
         setUser(null);
       } finally {
         setLoading(false);
@@ -118,13 +114,15 @@ export const AuthProvider = ({ children }) => {
 
   // Register
   const signup = async (data) => {
-    await api.post("/api/auth/register", data);
+    const res = await api.post("/api/auth/register", data);
+    console.log(res);
     await fetchProfile();
   };
 
   // Login
   const login = async (data) => {
-    await api.post("/api/auth/login", data);
+    const res = await api.post("/api/auth/login", data);
+    console.log(res);
     await fetchProfile();
   };
 

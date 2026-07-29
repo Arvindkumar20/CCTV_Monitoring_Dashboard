@@ -92,7 +92,6 @@ const guardianSchema = z.object({
   subSubCategoryId: z.string().optional(),
 
   relationship: z.string().default("Parent"),
-
   city: z.string().optional(),
   state: z.string().optional(),
   pincode: z.string().optional(),
@@ -168,7 +167,6 @@ export default function AddGuardian({
       address: {
         city: "",
         state: "",
-      
         country: "",
       },
       occupation: "",
