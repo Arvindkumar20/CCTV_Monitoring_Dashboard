@@ -214,6 +214,101 @@ class CameraApi {
     const response = await api.get("/api/cameras/export", { params });
     return response.data;
   }
+
+  /**
+   * ============================================
+   * STREAM MANAGEMENT API CALLS
+   * ============================================
+   */
+
+  /**
+   * Start HLS stream for a camera
+   * @param {string} cameraId - Camera ID
+   * @returns {Promise} - Promise with stream start result
+   */
+  async startStream(cameraId) {
+    const response = await api.post(`/api/cameras/${cameraId}/stream/start`);
+    return response.data;
+  }
+
+  /**
+   * Stop HLS stream for a camera
+   * @param {string} cameraId - Camera ID
+   * @returns {Promise} - Promise with stream stop result
+   */
+  async stopStream(cameraId) {
+    const response = await api.post(`/api/cameras/${cameraId}/stream/stop`);
+    return response.data;
+  }
+
+  /**
+   * Restart HLS stream for a camera
+   * @param {string} cameraId - Camera ID
+   * @returns {Promise} - Promise with stream restart result
+   */
+  async restartStream(cameraId) {
+    const response = await api.post(`/api/cameras/${cameraId}/stream/restart`);
+    return response.data;
+  }
+
+  /**
+   * Get stream status for a camera
+   * @param {string} cameraId - Camera ID
+   * @returns {Promise} - Promise with stream status
+   */
+  async getStreamStatus(cameraId) {
+    const response = await api.get(`/api/cameras/${cameraId}/stream/status`);
+    return response.data;
+  }
+
+  /**
+   * Get stream URL for viewing
+   * @param {string} cameraId - Camera ID
+   * @param {string} clientId - Optional client ID
+   * @returns {Promise} - Promise with stream URL
+   */
+  async getStreamUrl(cameraId, clientId) {
+    const params = clientId ? { clientId } : {};
+    const response = await api.get(`/api/cameras/${cameraId}/stream/url`, { params });
+    return response.data;
+  }
+
+  /**
+   * Get all active streams
+   * @returns {Promise} - Promise with active streams list
+   */
+  async getActiveStreams() {
+    const response = await api.get("/api/cameras/streams/active");
+    return response.data;
+  }
+
+  /**
+   * Get stream dashboard statistics
+   * @returns {Promise} - Promise with dashboard stats
+   */
+  async getStreamDashboardStats() {
+    const response = await api.get("/api/cameras/streams/dashboard-stats");
+    return response.data;
+  }
+
+  /**
+   * Client disconnected from stream
+   * @param {string} clientId - Client ID
+   * @returns {Promise} - Promise with disconnect result
+   */
+  async clientDisconnect(clientId) {
+    const response = await api.post("/api/cameras/streams/client-disconnect", { clientId });
+    return response.data;
+  }
+
+  /**
+   * Clean up inactive streams (Admin only)
+   * @returns {Promise} - Promise with cleanup result
+   */
+  async cleanupInactiveStreams() {
+    const response = await api.post("/api/cameras/streams/cleanup");
+    return response.data;
+  }
 }
 
 export const cameraApi = new CameraApi();

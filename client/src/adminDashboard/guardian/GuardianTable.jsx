@@ -236,7 +236,7 @@ export const GuardianTable = ({
           {/* Title and Stats */}
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <h2 className="font-semibold text-slate-800">Guardians</h2>
+              <h2 className="font-semibold text-slate-800">Viewers</h2>
               <Badge variant="secondary" className="rounded-full">
                 {filteredGuardians.length} / {guardians?.length}
               </Badge>
@@ -360,7 +360,7 @@ export const GuardianTable = ({
                       />
                     </TableHead>
                   )}
-                  <TableHead>Guardian</TableHead>
+                  <TableHead>Viewers</TableHead>
                   <TableHead>Student</TableHead>
                   <TableHead>Academic</TableHead>
                   <TableHead>Contact</TableHead>

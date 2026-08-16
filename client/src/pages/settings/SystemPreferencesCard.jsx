@@ -13,6 +13,7 @@ export const SystemPreferencesCard = ({
   onPasswordFormatChange,
   storageData 
 }) => {
+  
   const storagePercentage = (storageData?.used / storageData?.total) * 100 || 0;
 
   return (

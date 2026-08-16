@@ -46,7 +46,7 @@ const cameraSchema = new mongoose.Schema(
     },
     streamStatus: {
       type: String,
-      enum: ["online", "offline", "unknown", "connecting"],
+      enum: ["stopped", "startted", "unknown", "connecting","error","online","offline"],
       default: "online",
       index: true,
     },
@@ -255,6 +255,7 @@ cameraSchema.statics.getStats = async function(userId, userRole) {
     this.countDocuments({ ...filter, status: "maintenance" }),
     this.countDocuments({ ...filter, streamStatus: "online" }),
     this.countDocuments({ ...filter, streamStatus: "offline" }),
+    this.countDocuments({ ...filter, streamStatus: "error" }),
     this.aggregate([
       { $match: filter },
       {

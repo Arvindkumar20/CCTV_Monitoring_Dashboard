@@ -245,7 +245,7 @@ function GuardianManagementContent() {
             <GuardianHeaderSkeleton />
           ) : (
             <GuardianHeader
-              title="Guardian Management"
+              title="Viewers Management"
               description="Manage parent access and student linkages"
               stats={guardianStats}
               onAddClick={handleAddClick}
@@ -322,7 +322,7 @@ function GuardianManagementContent() {
             <DialogContent className="sm:max-w-md">
               <DialogHeader>
                 <DialogTitle className="text-xl font-bold text-slate-900">
-                  Guardian Details
+                  Viewers Details
                 </DialogTitle>
               </DialogHeader>
               {viewingGuardian && (

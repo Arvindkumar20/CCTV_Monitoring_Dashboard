@@ -42,7 +42,7 @@ class AuthService {
         email: userData.email.toLowerCase(),
         mobile: userData.mobile,
         password: hashedPassword,
-        role: userData.role || "principal",
+        role: "principal",
         emailVerificationToken: crypto
           .createHash("sha256")
           .update(emailVerificationToken)

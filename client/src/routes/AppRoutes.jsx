@@ -7,6 +7,7 @@ import AddGuardian from "@/adminDashboard/guardian/AddGuardian";
 import { CreateAccount } from "@/pages/CreateAccount";
 import GuardianDetails from "@/adminDashboard/guardian/GuardianDetails";
 import { Loader2 } from "lucide-react";
+import { CameraDashboard } from "@/pages/CameraDashboard";
 
 // Lazy imports
 const AdminDashboard = lazy(() => import("../pages/AdminDashboard"));
@@ -66,6 +67,17 @@ const AppRoutes = () => {
           element={
             <ProtectedRoute>
               <CategoryManagement />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/dashboard/cameras/live"
+          element={
+            <ProtectedRoute>
+              <AdminLayout>
+                <CameraDashboard />
+              </AdminLayout>
             </ProtectedRoute>
           }
         />

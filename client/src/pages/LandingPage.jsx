@@ -65,7 +65,7 @@ export default function LandingPage() {
   };
 
   const handleUserPortal = () => {
-    navigate("/user-portal");
+    navigate("/admin-login");
   };
 
   // Industries we serve

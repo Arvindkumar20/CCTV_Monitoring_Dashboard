@@ -9,18 +9,10 @@ import AppError from "../utils/AppError.js";
  * @access Private
  */
 export const createCamera = asyncHandler(async (req, res) => {
-    console.log(req.body)
-  const camera = await cameraService.createCamera(
-    req.body,
-    req.user.userId
-  );
+  console.log(req.body);
+  const camera = await cameraService.createCamera(req.body, req.user.userId);
 
-  return successResponse(
-    res,
-    "Camera created successfully",
-    camera,
-    201
-  );
+  return successResponse(res, "Camera created successfully", camera, 201);
 });
 
 /**
@@ -32,14 +24,10 @@ export const getAllCameras = asyncHandler(async (req, res) => {
   const result = await cameraService.getAllCameras(
     req.query,
     req.user.userId,
-    req.user.role
+    req.user.role,
   );
 
-  return successResponse(
-    res,
-    "Cameras fetched successfully",
-    result
-  );
+  return successResponse(res, "Cameras fetched successfully", result);
 });
 
 /**
@@ -51,14 +39,10 @@ export const getCameraById = asyncHandler(async (req, res) => {
   const camera = await cameraService.getCameraById(
     req.params.id,
     req.user.userId,
-    req.user.role
+    req.user.role,
   );
 
-  return successResponse(
-    res,
-    "Camera fetched successfully",
-    camera
-  );
+  return successResponse(res, "Camera fetched successfully", camera);
 });
 
 /**
@@ -71,14 +55,10 @@ export const updateCamera = asyncHandler(async (req, res) => {
     req.params.id,
     req.body,
     req.user.userId,
-    req.user.role
+    req.user.role,
   );
 
-  return successResponse(
-    res,
-    "Camera updated successfully",
-    camera
-  );
+  return successResponse(res, "Camera updated successfully", camera);
 });
 
 /**
@@ -90,14 +70,10 @@ export const deleteCamera = asyncHandler(async (req, res) => {
   const result = await cameraService.deleteCamera(
     req.params.id,
     req.user.userId,
-    req.user.role
+    req.user.role,
   );
 
-  return successResponse(
-    res,
-    "Camera deleted successfully",
-    result
-  );
+  return successResponse(res, "Camera deleted successfully", result);
 });
 
 /**
@@ -112,14 +88,10 @@ export const getByCategory = asyncHandler(async (req, res) => {
     categoryId,
     categoryType,
     req.user.userId,
-    req.user.role
+    req.user.role,
   );
 
-  return successResponse(
-    res,
-    "Cameras fetched successfully",
-    result
-  );
+  return successResponse(res, "Cameras fetched successfully", result);
 });
 
 /**
@@ -131,14 +103,10 @@ export const getByMainCategory = asyncHandler(async (req, res) => {
   const result = await cameraService.getByMainCategory(
     req.params.mainCategoryId,
     req.user.userId,
-    req.user.role
+    req.user.role,
   );
 
-  return successResponse(
-    res,
-    "Cameras fetched successfully",
-    result
-  );
+  return successResponse(res, "Cameras fetched successfully", result);
 });
 
 /**
@@ -150,14 +118,10 @@ export const getBySubCategory = asyncHandler(async (req, res) => {
   const result = await cameraService.getBySubCategory(
     req.params.subCategoryId,
     req.user.userId,
-    req.user.role
+    req.user.role,
   );
 
-  return successResponse(
-    res,
-    "Cameras fetched successfully",
-    result
-  );
+  return successResponse(res, "Cameras fetched successfully", result);
 });
 
 /**
@@ -169,14 +133,10 @@ export const getByNestedSubCategory = asyncHandler(async (req, res) => {
   const result = await cameraService.getByNestedSubCategory(
     req.params.nestedSubCategoryId,
     req.user.userId,
-    req.user.role
+    req.user.role,
   );
 
-  return successResponse(
-    res,
-    "Cameras fetched successfully",
-    result
-  );
+  return successResponse(res, "Cameras fetched successfully", result);
 });
 
 /**
@@ -188,13 +148,13 @@ export const toggleStatus = asyncHandler(async (req, res) => {
   const camera = await cameraService.toggleStatus(
     req.params.id,
     req.user.userId,
-    req.user.role
+    req.user.role,
   );
 
   return successResponse(
     res,
     `Camera ${camera.status === "active" ? "activated" : camera.status === "inactive" ? "deactivated" : "set to maintenance"} successfully`,
-    camera
+    camera,
   );
 });
 
@@ -208,13 +168,13 @@ export const updateStreamStatus = asyncHandler(async (req, res) => {
     req.params.id,
     req.body.status,
     req.user.userId,
-    req.user.role
+    req.user.role,
   );
 
   return successResponse(
     res,
     `Stream status updated to ${camera.streamStatus} successfully`,
-    camera
+    camera,
   );
 });
 
@@ -227,7 +187,7 @@ export const bulkDelete = asyncHandler(async (req, res) => {
   const result = await cameraService.bulkDelete(
     req.body.cameraIds,
     req.user.userId,
-    req.user.role
+    req.user.role,
   );
 
   return successResponse(res, result.message, result);
@@ -245,13 +205,13 @@ export const bulkUpdateStatus = asyncHandler(async (req, res) => {
     cameraIds,
     status,
     req.user.userId,
-    req.user.role
+    req.user.role,
   );
 
   return successResponse(
     res,
     `${result.modifiedCount} cameras updated to ${status} successfully`,
-    result
+    result,
   );
 });
 
@@ -271,7 +231,7 @@ export const searchCameras = asyncHandler(async (req, res) => {
     q,
     req.user.userId,
     req.user.role,
-    filters
+    filters,
   );
 
   return successResponse(res, "Search results fetched successfully", results);
@@ -283,10 +243,7 @@ export const searchCameras = asyncHandler(async (req, res) => {
  * @access Private
  */
 export const getStats = asyncHandler(async (req, res) => {
-  const stats = await cameraService.getStats(
-    req.user.userId,
-    req.user.role
-  );
+  const stats = await cameraService.getStats(req.user.userId, req.user.role);
 
   return successResponse(res, "Statistics fetched successfully", stats);
 });
@@ -315,7 +272,7 @@ export const getByRtspUrl = asyncHandler(async (req, res) => {
   const camera = await cameraService.getByRtspUrl(
     rtspUrl,
     req.user.userId,
-    req.user.role
+    req.user.role,
   );
 
   return successResponse(res, "Camera fetched successfully", camera);
@@ -332,7 +289,7 @@ export const getRecentCameras = asyncHandler(async (req, res) => {
   const cameras = await cameraService.getRecentCameras(
     parseInt(limit),
     req.user.userId,
-    req.user.role
+    req.user.role,
   );
 
   return successResponse(res, "Recent cameras fetched successfully", cameras);
@@ -346,7 +303,7 @@ export const getRecentCameras = asyncHandler(async (req, res) => {
 export const getStreamSummary = asyncHandler(async (req, res) => {
   const summary = await cameraService.getStreamSummary(
     req.user.userId,
-    req.user.role
+    req.user.role,
   );
 
   return successResponse(res, "Stream summary fetched successfully", summary);
@@ -363,7 +320,7 @@ export const exportCameras = asyncHandler(async (req, res) => {
   const data = await cameraService.exportCameras(
     req.user.userId,
     req.user.role,
-    req.query
+    req.query,
   );
 
   if (format === "csv") {
@@ -373,4 +330,210 @@ export const exportCameras = asyncHandler(async (req, res) => {
   }
 
   return successResponse(res, "Export data fetched successfully", data);
+});
+
+
+/**
+ * Start HLS stream for a camera
+ * POST /api/cameras/:cameraId/stream/start
+ */
+export const startStream = asyncHandler(async (req, res) => {
+  const { cameraId } = req.params;
+  const userId = req.user.userId;
+const userRole= req.user.role;
+  // Validate cameraId
+  if (!cameraId) {
+    throw new AppError("Camera ID is required", 400);
+  }
+
+  const result = await cameraService.startHLSStream(cameraId, userId,userRole);
+
+  res.status(200).json({
+    success: true,
+    message: result.message,
+    data: {
+      cameraId: result.cameraId,
+      hlsUrl: result.hlsUrl,
+      isStreaming: true
+    }
+  });
+});
+
+/**
+ * Stop HLS stream for a camera
+ * POST /api/cameras/:cameraId/stream/stop
+ */
+export const stopStream = asyncHandler(async (req, res) => {
+  const { cameraId } = req.params;
+  const userId = req.user.userId;
+
+  if (!cameraId) {
+    throw new AppError("Camera ID is required", 400);
+  }
+
+  const result = await cameraService.stopHLSStream(cameraId, userId);
+
+  res.status(200).json({
+    success: true,
+    message: result.message,
+    data: {
+      cameraId: result.cameraId,
+      isStreaming: false
+    }
+  });
+});
+
+/**
+ * Restart HLS stream for a camera
+ * POST /api/cameras/:cameraId/stream/restart
+ */
+export const restartStream = asyncHandler(async (req, res) => {
+  const { cameraId } = req.params;
+  const userId = req.user.userId;
+
+  if (!cameraId) {
+    throw new AppError("Camera ID is required", 400);
+  }
+
+  const result = await cameraService.restartHLSStream(cameraId, userId);
+
+  res.status(200).json({
+    success: true,
+    message: "Stream restarted successfully",
+    data: {
+      cameraId: result.cameraId,
+      hlsUrl: result.hlsUrl,
+      isStreaming: true
+    }
+  });
+});
+
+/**
+ * Get stream status for a camera
+ * GET /api/cameras/:cameraId/stream/status
+ */
+export const getStreamStatus = asyncHandler(async (req, res) => {
+  const { cameraId } = req.params;
+  const userId = req.user.userId;
+  const userRole = req.user.role;
+
+  if (!cameraId) {
+    throw new AppError("Camera ID is required", 400);
+  }
+
+  const streamInfo = await cameraService.getStreamInfo(cameraId, userId, userRole);
+
+  res.status(200).json({
+    success: true,
+    data: streamInfo
+  });
+});
+
+/**
+ * Get stream URL for viewing
+ * GET /api/cameras/:cameraId/stream/url
+ */
+export const getStreamUrl = asyncHandler(async (req, res) => {
+  const { cameraId } = req.params;
+  const userId = req.user.userId;
+  const userRole = req.user.role;
+  const clientId = req.query.clientId || `client-${Date.now()}`;
+
+  if (!cameraId) {
+    throw new AppError("Camera ID is required", 400);
+  }
+
+  const streamInfo = await cameraService.getStreamUrl(
+    cameraId, 
+    userId, 
+    userRole, 
+    clientId
+  );
+
+  res.status(200).json({
+    success: true,
+    data: {
+      cameraId: streamInfo.cameraId,
+      cameraName: streamInfo.cameraName,
+      hlsUrl: streamInfo.hlsUrl,
+      isStreaming: streamInfo.isStreaming,
+      streamStatus: streamInfo.streamStatus,
+      clients: streamInfo.clients,
+      clientId: clientId
+    }
+  });
+});
+
+/**
+ * Get all active streams
+ * GET /api/cameras/streams/active
+ */
+export const getActiveStreams = asyncHandler(async (req, res) => {
+  const userId = req.user.userId;
+  const userRole = req.user.role;
+
+  const activeStreams = await cameraService.getActiveStreams(userId, userRole);
+
+  res.status(200).json({
+    success: true,
+    data: {
+      activeStreams,
+      total: activeStreams.length
+    }
+  });
+});
+
+/**
+ * Get stream dashboard statistics
+ * GET /api/cameras/streams/dashboard-stats
+ */
+export const getStreamDashboardStats = asyncHandler(async (req, res) => {
+  const userId = req.user.userId;
+  const userRole = req.user.role;
+
+  const stats = await cameraService.getStreamDashboardStats(userId, userRole);
+
+  res.status(200).json({
+    success: true,
+    data: stats
+  });
+});
+
+
+
+/**
+ * Client disconnected from stream
+ * POST /api/cameras/streams/client-disconnect
+ */
+export const clientDisconnected = asyncHandler(async (req, res) => {
+  const { clientId } = req.body;
+
+  if (!clientId) {
+    throw new AppError("Client ID is required", 400);
+  }
+
+  await cameraService.clientDisconnected(clientId);
+
+  res.status(200).json({
+    success: true,
+    message: "Client disconnected successfully"
+  });
+});
+
+/**
+ * Clean up inactive streams (Admin only)
+ * POST /api/cameras/streams/cleanup
+ */
+export const cleanupInactiveStreams = asyncHandler(async (req, res) => {
+  // Check if user is admin
+  if (req.user.role !== 'admin') {
+    throw new AppError("Only admins can clean up streams", 403);
+  }
+
+  await cameraService.cleanupInactiveStreams();
+
+  res.status(200).json({
+    success: true,
+    message: "Inactive streams cleaned up successfully"
+  });
 });

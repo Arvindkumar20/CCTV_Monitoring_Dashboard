@@ -18,6 +18,8 @@ process.on('unhandledRejection', (err, promise) => {
 });
 
 
+
+
 // Handle uncaught exceptions
 process.on('uncaughtException', (err) => {
   console.log(`Error: ${err.message}`.red);

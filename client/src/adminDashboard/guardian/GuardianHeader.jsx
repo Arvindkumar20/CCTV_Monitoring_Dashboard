@@ -189,7 +189,7 @@ export const GuardianHeader = ({
           <p className="text-sm text-slate-500">{description}</p>
           {totalCount > 0 && (
             <p className="text-xs text-blue-600 mt-1 font-medium">
-              Total Guardians: {totalCount}
+              Total Viewers: {totalCount}
             </p>
           )}
         </div>
@@ -220,7 +220,7 @@ export const GuardianHeader = ({
             className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-lg shadow-blue-100"
           >
             <Plus className="w-4 h-4 mr-2" />
-            Add Guardian
+            Add Viewer
           </Button>
         </div>
       </div>
@@ -230,10 +230,10 @@ export const GuardianHeader = ({
         <DialogContent className="sm:max-w-5xl max-h-[85vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="text-xl font-bold text-slate-900">
-              Bulk Upload Guardians
+              Bulk Upload Viewers
             </DialogTitle>
             <DialogDescription>
-              Upload Excel or CSV file with guardian data
+              Upload Excel or CSV file with Viewers data
             </DialogDescription>
           </DialogHeader>
 
@@ -406,7 +406,7 @@ export const GuardianHeader = ({
         <DialogContent className="sm:max-w-5xl max-h-[85vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="text-xl font-bold text-slate-900">
-              Sample Guardian Data
+              Sample Viewers Data
             </DialogTitle>
             <DialogDescription>
               Preview of the expected data format for bulk upload
@@ -425,10 +425,10 @@ export const GuardianHeader = ({
                   <thead className="bg-slate-50">
                     <tr>
                       <th className="px-4 py-3 text-left text-xs font-semibold text-slate-600">
-                        Guardian Name
+                        Viewers Name
                       </th>
                       <th className="px-4 py-3 text-left text-xs font-semibold text-slate-600">
-                        Student Name
+                        Viewers Name
                       </th>
                       <th className="px-4 py-3 text-left text-xs font-semibold text-slate-600">
                         Mobile
@@ -453,8 +453,8 @@ export const GuardianHeader = ({
                   <tbody className="divide-y divide-slate-200">
                     {sampleData.map((row, index) => (
                       <tr key={index} className="hover:bg-slate-50">
-                        <td className="px-4 py-2">{row["Guardian Name"]}</td>
-                        <td className="px-4 py-2">{row["Student Name"]}</td>
+                        <td className="px-4 py-2">{row["Viewers Name"]}</td>
+                        <td className="px-4 py-2">{row["Viewer Name"]}</td>
                         <td className="px-4 py-2">{row.Mobile}</td>
                         <td className="px-4 py-2">{row.DOB}</td>
                         <td className="px-4 py-2">{row.Class}</td>
