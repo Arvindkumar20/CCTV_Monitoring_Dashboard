@@ -148,9 +148,6 @@
 //   </aside>
 // );
 
-
-
-
 // components/dashboard/Sidebar.jsx
 import React from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
@@ -168,6 +165,7 @@ import {
   LogOut,
   Video,
   X,
+  AlertCircleIcon,
 } from "lucide-react";
 import { showConfirmDialog } from "@/services/pop";
 import { useAuth } from "@/hooks/useAuth";
@@ -184,12 +182,15 @@ const navItems = [
   { icon: FolderTree, label: "Category Mgmt", href: "/dashboard/categories" },
   { icon: Camera, label: "Camera Mgmt", href: "/dashboard/cameras" },
   { icon: Camera, label: "Live Cameras", href: "/dashboard/cameras/live" },
+  { icon: AlertCircleIcon, label: "Alerts", href: "/dashboard/alerts" },
   { icon: History, label: "Activity Logs", href: "/dashboard/logs" },
+  { icon: Settings, label: "Settings", href: "/dashboard/settings" },
+
 ];
 
-const bottomNavItems = [
-  { icon: Settings, label: "Settings", href: "/dashboard/settings" },
-];
+// const bottomNavItems = [
+//   { icon: Settings, label: "Settings", href: "/dashboard/settings" },
+// ];
 
 export const Sidebar = ({ isMobile = false, onClose }) => {
   const { logout } = useAuth();
@@ -220,29 +221,29 @@ export const Sidebar = ({ isMobile = false, onClose }) => {
   };
 
   return (
-    <aside 
+    <aside
       className="h-full bg-slate-900 text-white flex flex-col"
       style={{
-        background: `linear-gradient(180deg, #0f172a 0%, ${secondaryColor}33 100%)`
+        background: `linear-gradient(180deg, #0f172a 0%, ${secondaryColor}33 100%)`,
       }}
     >
       {/* Sidebar Header */}
       <div className="p-6 flex items-center space-x-3">
         {logo ? (
-          <img 
-            src={logo} 
-            alt="Logo" 
+          <img
+            src={logo}
+            alt="Logo"
             className="w-8 h-8 object-contain rounded"
           />
         ) : (
-          <div 
+          <div
             className="w-8 h-8 rounded flex items-center justify-center"
             style={{ backgroundColor: primaryColor }}
           >
             <Video className="w-4 h-4 text-white" />
           </div>
         )}
-        <span 
+        <span
           className="text-xl font-bold tracking-tight"
           style={{ color: primaryColor }}
         >
@@ -269,6 +270,7 @@ export const Sidebar = ({ isMobile = false, onClose }) => {
               key={item.href}
               to={item.href}
               className={cn(
+
                 "flex items-center space-x-3 p-3 rounded-lg transition-all",
                 isActive
                   ? "bg-blue-600 text-white"
@@ -283,10 +285,9 @@ export const Sidebar = ({ isMobile = false, onClose }) => {
           );
         })}
 
-        <Separator className="my-4 bg-slate-800" />
-
+        {/* <Separator className="my-4 bg-slate-800" />
         {bottomNavItems.map((item) => (
-          <Link
+        <Link
             key={item.href}
             to={item.href}
             className="flex items-center space-x-3 text-slate-400 hover:bg-slate-800 hover:text-white p-3 rounded-lg transition-all"
@@ -294,8 +295,8 @@ export const Sidebar = ({ isMobile = false, onClose }) => {
           >
             <item.icon className="w-5 h-5" />
             <span className="font-medium">{item.label}</span>
-          </Link>
-        ))}
+          </Link> 
+        ))} */}
       </nav>
 
       {/* Sidebar Footer */}

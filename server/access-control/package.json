@@ -1,0 +1,22 @@
+{
+  "name": "@your-org/access-control",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "src/index.js",
+  "exports": {
+    ".": "./src/index.js",
+    "./adapters/mongodb": "./src/adapters/mongodb/index.js",
+    "./adapters/memory": "./src/adapters/memory/index.js",
+    "./adapters/express": "./src/adapters/express/authorize.js",
+    "./adapters/express/admin": "./src/adapters/express/admin.router.js"
+  },
+  "peerDependencies": {
+    "mongoose": "^7.0.0 || ^8.0.0",
+    "express": "^4.0.0"
+  },
+  "peerDependenciesMeta": {
+    "mongoose": { "optional": true },
+    "express": { "optional": true }
+  },
+  "dependencies": {}
+}

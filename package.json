@@ -1,0 +1,29 @@
+{
+  "name": "cctv",
+  "version": "1.0.0",
+  "description": "A secure and scalable CCTV Monitoring Dashboard built to provide real-time surveillance management, live camera monitoring, and role-based access control for organizations requiring centralized security operations.",
+  "main": "ecosystem.config.js",
+  "scripts": {
+    "dev": "concurrently -k -n detector,server,client -c blue,green,magenta \"npm:dev:detector\" \"npm:dev:server\" \"npm:dev:client\"",
+    "dev:detector": "cd server/detector-ai && ./venv/bin/python detector_server.py",
+    "dev:server": "cd server && npm run dev",
+    "dev:client": "cd client && npm run dev",
+    "build": "cd client && npm run build",
+    "prod": "pm2 start ecosystem.config.js",
+    "prod:reload": "pm2 reload all",
+    "prod:logs": "pm2 logs"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Arvindkumar20/CCTV_Monitoring_Dashboard.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Arvindkumar20/CCTV_Monitoring_Dashboard/issues"
+  },
+  "homepage": "https://github.com/Arvindkumar20/CCTV_Monitoring_Dashboard#readme"
+}

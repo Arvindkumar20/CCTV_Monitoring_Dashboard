@@ -1,0 +1,97 @@
+# # docker-compose.yml
+
+# version: '3.8'
+
+# services:
+#   # MongoDB
+#   mongo:
+#     image: mongo:6
+#     restart: always
+#     volumes:
+#       - mongo_data:/data/db
+#     environment:
+#       MONGO_INITDB_DATABASE: camera_db
+
+#   # Redis for distributed state
+#   redis:
+#     image: redis:7-alpine
+#     restart: always
+#     command: redis-server --appendonly yes
+#     volumes:
+#       - redis_data:/data
+
+#   # API Server (scale this)
+#   api:
+#     build: .
+#     restart: always
+#     ports:
+#       - "3000-3005:3000"
+#     environment:
+#       - NODE_ENV=production
+#       - MONGODB_URI=mongodb://mongo:27017/camera_db
+#       - REDIS_HOST=redis
+#       - MAX_CONCURRENT_STREAMS=25
+#       - HLS_BASE_PATH=/streams
+#     volumes:
+#       - streams_data:/streams
+#     depends_on:
+#       - mongo
+#       - redis
+#     deploy:
+#       replicas: 4
+#       resources:
+#         limits:
+#           cpus: '2'
+#           memory: 4G
+#         reservations:
+#           cpus: '1'
+#           memory: 2G
+
+#   # Nginx load balancer
+#   nginx:
+#     image: nginx:alpine
+#     restart: always
+#     ports:
+#       - "80:80"
+#     volumes:
+#       - ./nginx.conf:/etc/nginx/nginx.conf:ro
+#       - streams_data:/var/www/streams:ro
+#     depends_on:
+#       - api
+
+# volumes:
+#   # mongo_data:
+#   redis_data:
+#   # streams_data:
+
+
+
+
+
+
+
+
+
+
+version: "3.9"
+
+services:
+  cctv:
+    build: .
+    container_name: cctv-app
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+      - "8554:8554"
+      - "8888:8888"
+      - "8889:8889"
+      - "9997:9997"
+    env_file:
+      - ./server/.env
+    volumes:
+      # MediaMTX config live-edit ke liye
+      - ./server/mediamtx:/app/server/mediamtx:ro
+      # Models (bade hote hain)
+      - ./server/detector-ai/models:/app/server/detector-ai/models:ro
+      # Snapshots (host pe save ho)
+      - ./server/snapshots:/app/server/snapshots

@@ -53,7 +53,6 @@ class StreamService {
     // Save config to file
     const configFile = path.join(this.streamsDir, `${streamKey}.json`);
     fs.writeFileSync(configFile, JSON.stringify(config, null, 2));
-
     return {
       streamKey,
       streamUrl: `rtsp://localhost:8554/${streamKey}`,
@@ -89,7 +88,7 @@ class StreamService {
 
       return streamConfig;
     } catch (error) {
-      console.error('Failed to start stream:', error);
+      console.error('Failed to start stream:', error.message,error.name,error.stack);
       throw new Error('Stream could not be started');
     }
   }

@@ -17,6 +17,7 @@
     "@google-cloud/storage": "^5.18.3",
     "axios": "^1.19.0",
     "bcryptjs": "^3.0.3",
+    "child_process": "^1.0.2",
     "colors": "^1.4.0",
     "compression": "^1.8.1",
     "cookie-parser": "^1.4.7",
@@ -30,24 +31,33 @@
     "express-useragent": "^2.1.0",
     "express-validator": "^7.3.1",
     "ffmpeg-static": "^5.3.0",
+    "ffprobe-static": "^3.1.0",
     "firebase-admin": "^14.2.0",
     "fluent-ffmpeg": "^2.1.3",
     "fs-extra": "^11.4.0",
     "geoip-lite": "^1.2.2",
+    "@internal/access-control": "file:./src/access-control",
     "helmet": "^8.1.0",
     "hpp": "^0.2.3",
+    "ioredis": "^6.0.0",
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.2.1",
     "morgan": "^1.10.1",
     "multer": "^2.0.2",
+    "node-cron": "^4.6.0",
+    "nodemailer": "^10.0.10",
     "onvif": "^0.8.1",
+    "socket.io": "^4.8.3",
+    "twilio": "^6.1.1",
     "ua-parser-js": "^2.0.9",
     "uuid": "^14.0.1",
+    "web-push": "^3.6.7",
     "winston": "^3.19.0",
     "xlsx": "^0.18.5",
     "xss-clean": "^0.1.4"
   },
   "devDependencies": {
-    "nodemon": "^3.1.11"
+    "@types/web-push": "^3.6.4",
+    "nodemon": "^3.1.14"
   }
 }

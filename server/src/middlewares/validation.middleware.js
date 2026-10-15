@@ -1,12 +1,43 @@
 import { validationResult } from "express-validator";
 import AppError from "../utils/AppError.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
+function fixRtspUrl(url) {
+  if (!url || typeof url !== 'string') return url;
+  // Agar already sahi hai (single @), kuch mat karo
+  const atCount = (url.match(/@/g) || []).length;
+  if (atCount <= 1) return url;
 
+  // Multiple @ hain — last @ ko separator maano
+  const schemeMatch = url.match(/^(rtsps?|rtmps?):\/\//i);
+  if (!schemeMatch) return url;
+  const scheme = schemeMatch[0];
+  const rest = url.slice(scheme.length);
+
+  const pathStart = rest.search(/[/?#]/);
+  const authority = pathStart === -1 ? rest : rest.slice(0, pathStart);
+  const pathPart  = pathStart === -1 ? ''   : rest.slice(pathStart);
+
+  const lastAt = authority.lastIndexOf('@');
+  const creds = authority.slice(0, lastAt);   // "admin:India@123"
+  const host  = authority.slice(lastAt + 1);  // "toyota.ddns.net:554"
+
+  const ci = creds.indexOf(':');
+  const user = ci === -1 ? creds : creds.slice(0, ci);
+  const pass = ci === -1 ? ''    : creds.slice(ci + 1);
+
+  const enc = (s) => { try { return encodeURIComponent(decodeURIComponent(s)); } catch { return encodeURIComponent(s); } };
+
+  return `${scheme}${enc(user)}${pass ? ':' + enc(pass) : ''}@${host}${pathPart}`;
+}
 /**
  * Method 1: Validation using next() + Global Error Handler (Recommended)
  */
 export const validate = (validations) => {
+  
   return asyncHandler(async (req, res, next) => {
+     if (req.body?.rtspUrl) {
+    req.body.rtspUrl = fixRtspUrl(req.body.rtspUrl);   // 👈 YE ADD KARO
+  }
   console.log(req.body);
 
     // Run all validations

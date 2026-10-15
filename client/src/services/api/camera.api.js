@@ -1,11 +1,13 @@
 import api from "../api";
 
 class CameraApi {
+
   /**
    * Get all cameras with pagination and filters
    * @param {Object} params - Query parameters
    * @returns {Promise} - Promise with cameras data
    */
+  
   async getAll(params = {}) {
     const response = await api.get("/api/cameras", { params });
     return response.data;

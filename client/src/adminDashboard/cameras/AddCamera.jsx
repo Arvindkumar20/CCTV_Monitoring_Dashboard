@@ -21,7 +21,7 @@ const cameraSchema = z.object({
   rtspUrl: z
     .string()
     .min(1, "RTSP URL is required")
-    .url("Please enter a valid URL")
+    // .url("Please enter a valid URL")
     .startsWith("rtsp://", "RTSP URL must start with rtsp://"),
   mainCategoryId: z.string().min(1, "Please select a main category"),
   subCategoryId: z.string().optional(),

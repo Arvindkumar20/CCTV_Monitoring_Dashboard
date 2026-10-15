@@ -1,436 +1,115 @@
-// import { cameraApi } from "@/services/api/camera.api";
-// import { useState, useEffect, useCallback } from "react";
-// import Swal from "sweetalert2";
 
-// export const useCameras = () => {
-//   const [cameras, setCameras] = useState([]);
-//   const [loading, setLoading] = useState(true);
-//   const [cameraStatus, setCameraStatus] = useState(true);
-//   const [error, setError] = useState(null);
-//   const [isSubmitting, setIsSubmitting] = useState(false);
-//   const [pagination, setPagination] = useState({
-//     page: 1,
-//     limit: 10,
-//     total: 0,
-//     pages: 0,
-//   });
-//   const [filters, setFilters] = useState({});
-//   const [stats, setStats] = useState(null);
-
-//   // Initial Load
-//   useEffect(() => {
-//     const loadInitialData = async () => {
-//       try {
-//         setLoading(true);
-
-//         const [camerasRes, statsRes] = await Promise.all([
-//           cameraApi.getAll({ page: 1, limit: 10 }),
-//           cameraApi.getStats(),
-//         ]);
-
-//         if (camerasRes?.success) {
-//           setCameras(camerasRes.data?.cameras || camerasRes.data || []);
-//           if (camerasRes.pagination) {
-//             setPagination(camerasRes.pagination);
-//           }
-//         }
-
-//         if (statsRes?.success) {
-//           setStats(statsRes.data);
-//         }
-
-//         setError(null);
-//       } catch (err) {
-//         setError(err.message || "Failed to load camera data");
-//         Swal.fire({
-//           icon: "error",
-//           title: "Error",
-//           text: err.message || "Failed to load camera data",
-//           toast: true,
-//           position: "top-end",
-//           showConfirmButton: false,
-//           timer: 3000,
-//         });
-//       } finally {
-//         setLoading(false);
-//       }
-//     };
-
-//     loadInitialData();
-//   }, []);
-
-//   // Fetch Cameras
-//   const fetchCameras = useCallback(
-//     async (params = {}) => {
-//       try {
-//         setLoading(true);
-
-//         const queryParams = {
-//           page: params.page || pagination.page,
-//           limit: params.limit || pagination.limit,
-//           ...filters,
-//           ...params,
-//         };
-
-//         const response = await cameraApi.getAll(queryParams);
-
-//         if (response?.success) {
-//           setCameras(response.data?.cameras || response.data || []);
-//           if (response.pagination) {
-//             setPagination(response.pagination);
-//           }
-//         }
-
-//         return response;
-//       } catch (err) {
-//         setError(err.message);
-//         Swal.fire({
-//           icon: "error",
-//           title: "Error",
-//           text: err.message || "Failed to fetch cameras",
-//         });
-//         throw err;
-//       } finally {
-//         setLoading(false);
-//       }
-//     },
-//     [filters, pagination.page, pagination.limit],
-//   );
-
-//   // Create Camera
-//   const addCamera = async (data) => {
-//     try {
-//       setIsSubmitting(true);
-//       const response = await cameraApi.create(data);
-
-//       if (response?.success) {
-//         await fetchCameras();
-//         await fetchStats();
-
-//         Swal.fire({
-//           icon: "success",
-//           title: "Success!",
-//           text: response.message || "Camera added successfully",
-//           timer: 2000,
-//           showConfirmButton: false,
-//         });
-
-//         return true;
-//       }
-//       return false;
-//     } catch (err) {
-//       Swal.fire({
-//         icon: "error",
-//         title: "Error",
-//         text: err.message || "Failed to add camera",
-//       });
-//       return false;
-//     } finally {
-//       setIsSubmitting(false);
-//     }
-//   };
-
-//   // Update Camera
-//   const editCamera = async (id, data) => {
-//     try {
-//       setIsSubmitting(true);
-//       const response = await cameraApi.update(id, data);
-
-//       if (response?.success) {
-//         setCameras((prev) =>
-//           prev.map((cam) =>
-//             cam._id === id ? { ...cam, ...response.data } : cam,
-//           ),
-//         );
-
-//         await fetchStats();
-
-//         Swal.fire({
-//           icon: "success",
-//           title: "Updated!",
-//           text: response.message || "Camera updated successfully",
-//           timer: 2000,
-//           showConfirmButton: false,
-//         });
-
-//         return true;
-//       }
-//       return false;
-//     } catch (err) {
-//       Swal.fire({
-//         icon: "error",
-//         title: "Error",
-//         text: err.message || "Failed to update camera",
-//       });
-//       return false;
-//     } finally {
-//       setIsSubmitting(false);
-//     }
-//   };
-
-//   // Delete Camera
-//   const removeCamera = async (id) => {
-//     try {
-//       const result = await Swal.fire({
-//         title: "Are you sure?",
-//         icon: "warning",
-//         showCancelButton: true,
-//         confirmButtonColor: "#d33",
-//         confirmButtonText: "Yes, delete it!",
-//       });
-
-//       if (!result.isConfirmed) return false;
-
-//       const response = await cameraApi.delete(id);
-
-//       if (response?.success) {
-//         setCameras((prev) => prev.filter((cam) => cam._id !== id));
-//         await fetchStats();
-
-//         Swal.fire({
-//           icon: "success",
-//           title: "Deleted!",
-//           timer: 2000,
-//           showConfirmButton: false,
-//         });
-
-//         return true;
-//       }
-//       return false;
-//     } catch (err) {
-//       Swal.fire({
-//         icon: "error",
-//         title: "Error",
-//         text: err.message || "Failed to delete camera",
-//       });
-//       return false;
-//     }
-//   };
-
-//   // Fetch Stats
-//   const fetchStats = async () => {
-//     try {
-//       const response = await cameraApi.getStats();
-//       if (response?.success) {
-//         setStats(response.data);
-//         return response.data;
-//       }
-//     } catch (err) {
-//       console.error("Failed to fetch stats:", err);
-//     }
-//   };
-
-//   // Helpers
-//   const getOnlineCount = () =>
-//     cameras.filter((cam) => cam.streamStatus === "online").length;
-
-//   const getOfflineCount = () =>
-//     cameras.filter((cam) => cam.streamStatus === "offline").length;
-
-//   const getActiveCount = () =>
-//     cameras.filter((cam) => cam.status === "active").length;
-
-//   const getInactiveCount = () =>
-//     cameras.filter((cam) => cam.status === "inactive").length;
-
-//   const statusToggle = async (id) => {
-   
-//     const res = await cameraApi.toggleStatus(id);
-//     // console.log(res.data.status);
-//      setCameraStatus(res.data.status);
-//      fetchCameras();
-//      return res.data.status;
-//   };
-//   return {
-//     cameras,
-//     loading,
-//     error,
-//     isSubmitting,
-//     pagination,
-//     filters,
-//     stats,
-
-//     addCamera,
-//     editCamera,
-//     removeCamera,
-//     fetchCameras,
-//     fetchStats,
-//     cameraStatus,
-//     statusToggle,
-//     getOnlineCount,
-//     getOfflineCount,
-//     getActiveCount,
-//     getInactiveCount,
-//   };
-// };
-
-// hooks/useCameras.js
+// frontend/src/hooks/useCameras.js
 import { cameraApi } from "@/services/api/camera.api";
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useCallback } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import Swal from "sweetalert2";
 
-export const useCameras = () => {
-  const [cameras, setCameras] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [pagination, setPagination] = useState({
+// ============================================
+// QUERY KEYS (Centralized)
+// ============================================
+
+export const cameraKeys = {
+  all: ["cameras"],
+  lists: () => [...cameraKeys.all, "list"],
+  list: (params) => [...cameraKeys.lists(), params],
+  details: () => [...cameraKeys.all, "detail"],
+  detail: (id) => [...cameraKeys.details(), id],
+  stats: () => [...cameraKeys.all, "stats"],
+  streamStats: () => [...cameraKeys.all, "stream-stats"],
+  byCategory: (type, id) => [...cameraKeys.all, "category", type, id],
+};
+
+// ============================================
+// API FUNCTIONS (Already in camera.api.js)
+// ============================================
+
+const fetchCamerasFn = async (params) => {
+  const response = await cameraApi.getAll(params);
+  if (!response?.success) throw new Error("Failed to fetch cameras");
+  return {
+    cameras: response.data?.cameras || response.data || [],
+    pagination: response.pagination || { page: 1, limit: 10, total: 0, pages: 0 },
+  };
+};
+
+const fetchStatsFn = async () => {
+  const response = await cameraApi.getStats();
+  if (!response?.success) throw new Error("Failed to fetch stats");
+  return response.data;
+};
+
+const fetchStreamStatsFn = async () => {
+  const response = await cameraApi.getStreamDashboardStats();
+  if (!response?.success) throw new Error("Failed to fetch stream stats");
+  return response.data;
+};
+
+// ============================================
+// MAIN HOOK
+// ============================================
+
+export const useCameras = (initialParams = {}) => {
+  const queryClient = useQueryClient();
+
+  // Local state for params (page, filters, etc.)
+  const [params, setParams] = useState({
     page: 1,
     limit: 10,
-    total: 0,
-    pages: 0,
+    ...initialParams,
   });
-  const [filters, setFilters] = useState({});
-  const [stats, setStats] = useState(null);
-  const [streamStats, setStreamStats] = useState(null);
-  
-  const pollingInterval = useRef(null);
-  const isMounted = useRef(true);
 
-  // Auto-refresh every 30 seconds
-  useEffect(() => {
-    isMounted.current = true;
-    
-    // Start polling
-    pollingInterval.current = setInterval(() => {
-      if (isMounted.current) {
-        refreshData();
-      }
-    }, 30000); // Refresh every 30 seconds
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-    return () => {
-      isMounted.current = false;
-      if (pollingInterval.current) {
-        clearInterval(pollingInterval.current);
-      }
-    };
-  }, []);
+  // ============================================
+  // QUERIES (Auto-cached, dedup, background refetch)
+  // ============================================
 
-  // Refresh data in background
-  const refreshData = useCallback(async () => {
-    try {
-      const [camerasRes, statsRes, streamStatsRes] = await Promise.all([
-        cameraApi.getAll({ page: pagination.page, limit: pagination.limit }),
-        cameraApi.getStats(),
-        cameraApi.getStreamDashboardStats(),
-      ]);
+  // ✅ Cameras list - fetch when params change
+  const camerasQuery = useQuery({
+    queryKey: cameraKeys.list(params),
+    queryFn: () => fetchCamerasFn(params),
+    staleTime: 30 * 1000,        // 30 sec - data fresh
+    gcTime: 5 * 60 * 1000,        // 5 min - keep in cache
+    refetchInterval: 30 * 1000,   // Auto refetch every 30 sec
+    refetchIntervalInBackground: false, // Only when tab visible
+    refetchOnWindowFocus: true,   // Refresh on tab focus
+    keepPreviousData: true,       // ✅ Pagination smooth
+    retry: 2,
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 5000),
+  });
 
-      if (camerasRes?.success && isMounted.current) {
-        setCameras(camerasRes.data?.cameras || camerasRes.data || []);
-        if (camerasRes.pagination) {
-          setPagination(camerasRes.pagination);
-        }
-      }
+  // ✅ Stats - rarely changes, longer staleTime
+  const statsQuery = useQuery({
+    queryKey: cameraKeys.stats(),
+    queryFn: fetchStatsFn,
+    staleTime: 60 * 1000,         // 1 min
+    refetchInterval: 60 * 1000,   // Auto refresh every min
+    refetchOnWindowFocus: true,
+    retry: 2,
+  });
 
-      if (statsRes?.success && isMounted.current) {
-        setStats(statsRes.data);
-      }
+  // ✅ Stream stats - changes often
+  const streamStatsQuery = useQuery({
+    queryKey: cameraKeys.streamStats(),
+    queryFn: fetchStreamStatsFn,
+    staleTime: 15 * 1000,          // 15 sec
+    refetchInterval: 15 * 1000,    // Auto refresh every 15 sec
+    refetchOnWindowFocus: true,
+    retry: 2,
+  });
 
-      if (streamStatsRes?.success && isMounted.current) {
-        setStreamStats(streamStatsRes.data);
-      }
-    } catch (err) {
-      // Silent refresh - don't show errors
-      console.debug("Background refresh failed:", err);
-    }
-  }, [pagination.page, pagination.limit]);
+  // ============================================
+  // MUTATIONS (CRUD with optimistic updates)
+  // ============================================
 
-  // Initial Load
-  useEffect(() => {
-    const loadInitialData = async () => {
-      try {
-        setLoading(true);
-        const [camerasRes, statsRes, streamStatsRes] = await Promise.all([
-          cameraApi.getAll({ page: 1, limit: 10 }),
-          cameraApi.getStats(),
-          cameraApi.getStreamDashboardStats(),
-        ]);
-
-        if (camerasRes?.success && isMounted.current) {
-          setCameras(camerasRes.data?.cameras || camerasRes.data || []);
-          if (camerasRes.pagination) {
-            setPagination(camerasRes.pagination);
-          }
-        }
-
-        if (statsRes?.success && isMounted.current) {
-          setStats(statsRes.data);
-        }
-
-        if (streamStatsRes?.success && isMounted.current) {
-          setStreamStats(streamStatsRes.data);
-        }
-
-        setError(null);
-      } catch (err) {
-        if (isMounted.current) {
-          setError(err.message || "Failed to load camera data");
-          Swal.fire({
-            icon: "error",
-            title: "Error",
-            text: err.message || "Failed to load camera data",
-            toast: true,
-            position: "top-end",
-            showConfirmButton: false,
-            timer: 3000,
-          });
-        }
-      } finally {
-        if (isMounted.current) {
-          setLoading(false);
-        }
-      }
-    };
-
-    loadInitialData();
-  }, []);
-
-  // Fetch Cameras
-  const fetchCameras = useCallback(
-    async (params = {}) => {
-      try {
-        setLoading(true);
-        const queryParams = {
-          page: params.page || pagination.page,
-          limit: params.limit || pagination.limit,
-          ...filters,
-          ...params,
-        };
-
-        const response = await cameraApi.getAll(queryParams);
-
-        if (response?.success && isMounted.current) {
-          setCameras(response.data?.cameras || response.data || []);
-          if (response.pagination) {
-            setPagination(response.pagination);
-          }
-        }
-
-        return response;
-      } catch (err) {
-        if (isMounted.current) {
-          setError(err.message);
-        }
-        throw err;
-      } finally {
-        if (isMounted.current) {
-          setLoading(false);
-        }
-      }
-    },
-    [filters, pagination.page, pagination.limit],
-  );
-
-  // Create Camera
-  const addCamera = async (data) => {
-    try {
-      setIsSubmitting(true);
-      const response = await cameraApi.create(data);
-
+  // ✅ Create camera
+  const createMutation = useMutation({
+    mutationFn: (data) => cameraApi.create(data),
+    onSuccess: async (response) => {
       if (response?.success) {
-        await fetchCameras();
-        await fetchStats();
-        await fetchStreamStats();
+        // Invalidate & refetch all camera queries
+        await queryClient.invalidateQueries({ queryKey: cameraKeys.all });
 
         Swal.fire({
           icon: "success",
@@ -441,38 +120,36 @@ export const useCameras = () => {
           toast: true,
           position: "top-end",
         });
-
-        return true;
       }
-      return false;
-    } catch (err) {
+    },
+    onError: (err) => {
       Swal.fire({
         icon: "error",
         title: "Error",
         text: err.message || "Failed to add camera",
       });
-      return false;
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
+    },
+  });
 
-  // Update Camera
-  const editCamera = async (id, data) => {
-    try {
-      setIsSubmitting(true);
-      const response = await cameraApi.update(id, data);
-
+  // ✅ Update camera
+  const updateMutation = useMutation({
+    mutationFn: ({ id, data }) => cameraApi.update(id, data),
+    onSuccess: (response, { id }) => {
       if (response?.success) {
-        // Optimistic update
-        setCameras((prev) =>
-          prev.map((cam) =>
-            cam._id === id ? { ...cam, ...response.data } : cam,
-          ),
-        );
+        // Optimistic update in cache
+        queryClient.setQueryData(cameraKeys.list(params), (old) => {
+          if (!old) return old;
+          return {
+            ...old,
+            cameras: old.cameras.map((cam) =>
+              cam._id === id ? { ...cam, ...response.data } : cam,
+            ),
+          };
+        });
 
-        await fetchStats();
-        await fetchStreamStats();
+        // Invalidate stats
+        queryClient.invalidateQueries({ queryKey: cameraKeys.stats() });
+        queryClient.invalidateQueries({ queryKey: cameraKeys.streamStats() });
 
         Swal.fire({
           icon: "success",
@@ -483,25 +160,257 @@ export const useCameras = () => {
           toast: true,
           position: "top-end",
         });
-
-        return true;
       }
-      return false;
-    } catch (err) {
+    },
+    onError: (err) => {
       Swal.fire({
         icon: "error",
         title: "Error",
         text: err.message || "Failed to update camera",
       });
-      return false;
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
+    },
+  });
 
-  // Delete Camera
-  const removeCamera = async (id) => {
-    try {
+  // ✅ Delete camera
+  const deleteMutation = useMutation({
+    mutationFn: (id) => cameraApi.delete(id),
+    onSuccess: async (response) => {
+      if (response?.success) {
+        await queryClient.invalidateQueries({ queryKey: cameraKeys.all });
+
+        Swal.fire({
+          icon: "success",
+          title: "Deleted!",
+          timer: 1500,
+          showConfirmButton: false,
+          toast: true,
+          position: "top-end",
+        });
+      }
+    },
+    onError: (err) => {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: err.message || "Failed to delete camera",
+      });
+    },
+  });
+
+  // ✅ Toggle status
+  const toggleStatusMutation = useMutation({
+    mutationFn: (id) => cameraApi.toggleStatus(id),
+    onMutate: async (id) => {
+      // Cancel outgoing refetches
+      await queryClient.cancelQueries({ queryKey: cameraKeys.lists() });
+
+      // Snapshot for rollback
+      const previousData = queryClient.getQueryData(cameraKeys.list(params));
+
+      // Optimistic update
+      queryClient.setQueryData(cameraKeys.list(params), (old) => {
+        if (!old) return old;
+        const camera = old.cameras.find((c) => c._id === id);
+        const newStatus = camera?.status === "active" ? "inactive" : "active";
+        const newStreamStatus = newStatus === "active" ? "online" : "offline";
+
+        return {
+          ...old,
+          cameras: old.cameras.map((cam) =>
+            cam._id === id
+              ? { ...cam, status: newStatus, streamStatus: newStreamStatus }
+              : cam,
+          ),
+        };
+      });
+
+      return { previousData };
+    },
+    onError: (err, id, context) => {
+      // Rollback
+      if (context?.previousData) {
+        queryClient.setQueryData(cameraKeys.list(params), context.previousData);
+      }
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "Failed to toggle camera status",
+        toast: true,
+        position: "top-end",
+        showConfirmButton: false,
+        timer: 3000,
+      });
+    },
+    onSettled: () => {
+      // Refetch after mutation
+      queryClient.invalidateQueries({ queryKey: cameraKeys.stats() });
+      queryClient.invalidateQueries({ queryKey: cameraKeys.streamStats() });
+    },
+  });
+
+  // ✅ Start stream
+  const startStreamMutation = useMutation({
+    mutationFn: (cameraId) => cameraApi.startStream(cameraId),
+    onMutate: async (cameraId) => {
+      await queryClient.cancelQueries({ queryKey: cameraKeys.lists() });
+      const previousData = queryClient.getQueryData(cameraKeys.list(params));
+
+      // Optimistic: mark as streaming
+      queryClient.setQueryData(cameraKeys.list(params), (old) => {
+        if (!old) return old;
+        return {
+          ...old,
+          cameras: old.cameras.map((cam) =>
+            cam._id === cameraId
+              ? { ...cam, isStreaming: true, streamStatus: "streaming" }
+              : cam,
+          ),
+        };
+      });
+
+      return { previousData };
+    },
+    onSuccess: (response, cameraId, context) => {
+      if (response?.success) {
+        // Update with actual hlsUrl
+        queryClient.setQueryData(cameraKeys.list(params), (old) => {
+          if (!old) return old;
+          return {
+            ...old,
+            cameras: old.cameras.map((cam) =>
+              cam._id === cameraId
+                ? {
+                    ...cam,
+                    hlsUrl: response.data?.hlsUrl || response.hlsUrl,
+                    isStreaming: true,
+                    streamStatus: "streaming",
+                  }
+                : cam,
+            ),
+          };
+        });
+
+        queryClient.invalidateQueries({ queryKey: cameraKeys.streamStats() });
+      }
+    },
+    onError: (err, cameraId, context) => {
+      if (context?.previousData) {
+        queryClient.setQueryData(cameraKeys.list(params), context.previousData);
+      }
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: err.message || "Failed to start stream",
+      });
+    },
+  });
+
+  // ✅ Stop stream
+  const stopStreamMutation = useMutation({
+    mutationFn: (cameraId) => cameraApi.stopStream(cameraId),
+    onMutate: async (cameraId) => {
+      await queryClient.cancelQueries({ queryKey: cameraKeys.lists() });
+      const previousData = queryClient.getQueryData(cameraKeys.list(params));
+
+      queryClient.setQueryData(cameraKeys.list(params), (old) => {
+        if (!old) return old;
+        return {
+          ...old,
+          cameras: old.cameras.map((cam) =>
+            cam._id === cameraId
+              ? { ...cam, isStreaming: false, streamStatus: "stopped" }
+              : cam,
+          ),
+        };
+      });
+
+      return { previousData };
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: cameraKeys.streamStats() });
+    },
+    onError: (err, cameraId, context) => {
+      if (context?.previousData) {
+        queryClient.setQueryData(cameraKeys.list(params), context.previousData);
+      }
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: err.message || "Failed to stop stream",
+      });
+    },
+  });
+
+  // ✅ Restart stream
+  const restartStreamMutation = useMutation({
+    mutationFn: (cameraId) => cameraApi.restartStream(cameraId),
+    onSuccess: (response, cameraId) => {
+      if (response?.success) {
+        queryClient.setQueryData(cameraKeys.list(params), (old) => {
+          if (!old) return old;
+          return {
+            ...old,
+            cameras: old.cameras.map((cam) =>
+              cam._id === cameraId
+                ? {
+                    ...cam,
+                    hlsUrl: response.data?.hlsUrl || response.hlsUrl,
+                    isStreaming: true,
+                    streamStatus: "streaming",
+                  }
+                : cam,
+            ),
+          };
+        });
+
+        queryClient.invalidateQueries({ queryKey: cameraKeys.streamStats() });
+      }
+    },
+    onError: (err) => {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: err.message || "Failed to restart stream",
+      });
+    },
+  });
+
+  // ============================================
+  // WRAPPER FUNCTIONS (Compatible with existing code)
+  // ============================================
+
+  const addCamera = useCallback(
+    async (data) => {
+      setIsSubmitting(true);
+      try {
+        const response = await createMutation.mutateAsync(data);
+        return response?.success || false;
+      } catch {
+        return false;
+      } finally {
+        setIsSubmitting(false);
+      }
+    },
+    [createMutation],
+  );
+
+  const editCamera = useCallback(
+    async (id, data) => {
+      setIsSubmitting(true);
+      try {
+        const response = await updateMutation.mutateAsync({ id, data });
+        return response?.success || false;
+      } catch {
+        return false;
+      } finally {
+        setIsSubmitting(false);
+      }
+    },
+    [updateMutation],
+  );
+
+  const removeCamera = useCallback(
+    async (id) => {
       const result = await Swal.fire({
         title: "Are you sure?",
         text: "You won't be able to revert this!",
@@ -514,356 +423,264 @@ export const useCameras = () => {
 
       if (!result.isConfirmed) return false;
 
-      // Optimistic delete
-      const deletedCamera = cameras.find(cam => cam._id === id);
-      setCameras((prev) => prev.filter((cam) => cam._id !== id));
+      try {
+        const response = await deleteMutation.mutateAsync(id);
+        return response?.success || false;
+      } catch {
+        return false;
+      }
+    },
+    [deleteMutation],
+  );
 
-      const response = await cameraApi.delete(id);
+  const statusToggle = useCallback(
+    async (id) => {
+      try {
+        const response = await toggleStatusMutation.mutateAsync(id);
+        return response?.data?.status || null;
+      } catch {
+        return null;
+      }
+    },
+    [toggleStatusMutation],
+  );
 
-      if (response?.success) {
-        await fetchStats();
-        await fetchStreamStats();
+  const startStream = useCallback(
+    async (cameraId, silent = false) => {
+      if (!silent) setIsSubmitting(true);
+      try {
+        const response = await startStreamMutation.mutateAsync(cameraId);
 
-        Swal.fire({
-          icon: "success",
-          title: "Deleted!",
-          timer: 1500,
-          showConfirmButton: false,
-          toast: true,
-          position: "top-end",
-        });
-
-        return true;
-      } else {
-        // Revert on error
-        if (deletedCamera) {
-          setCameras((prev) => [...prev, deletedCamera]);
+        if (!silent && response?.success) {
+          Swal.fire({
+            icon: "success",
+            title: "Stream Started",
+            text: "Camera stream started successfully",
+            timer: 1500,
+            showConfirmButton: false,
+            toast: true,
+            position: "top-end",
+          });
         }
-        throw new Error("Delete failed");
+
+        return response?.data || response;
+      } catch {
+        return null;
+      } finally {
+        if (!silent) setIsSubmitting(false);
       }
-    } catch (err) {
-      Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: err.message || "Failed to delete camera",
-      });
-      return false;
-    }
+    },
+    [startStreamMutation],
+  );
+
+  const stopStream = useCallback(
+    async (cameraId, silent = false) => {
+      if (!silent) setIsSubmitting(true);
+      try {
+        const response = await stopStreamMutation.mutateAsync(cameraId);
+
+        if (!silent && response?.success) {
+          Swal.fire({
+            icon: "info",
+            title: "Stream Stopped",
+            text: "Camera stream stopped successfully",
+            timer: 1500,
+            showConfirmButton: false,
+            toast: true,
+            position: "top-end",
+          });
+        }
+
+        return response?.data || response;
+      } catch {
+        return null;
+      } finally {
+        if (!silent) setIsSubmitting(false);
+      }
+    },
+    [stopStreamMutation],
+  );
+
+  const restartStream = useCallback(
+    async (cameraId) => {
+      setIsSubmitting(true);
+      try {
+        const response = await restartStreamMutation.mutateAsync(cameraId);
+
+        if (response?.success) {
+          Swal.fire({
+            icon: "success",
+            title: "Stream Restarted",
+            text: "Camera stream restarted successfully",
+            timer: 1500,
+            showConfirmButton: false,
+            toast: true,
+            position: "top-end",
+          });
+        }
+
+        return response?.data || response;
+      } catch {
+        return null;
+      } finally {
+        setIsSubmitting(false);
+      }
+    },
+    [restartStreamMutation],
+  );
+
+  // ✅ Bulk start all streams (uses fetch directly, not hook)
+  const startAllStreams = useCallback(
+    async (cameraIds) => {
+      try {
+        console.log(`🚀 Starting ${cameraIds.length} streams...`);
+
+        const BATCH_SIZE = 5;
+        const results = [];
+
+        for (let i = 0; i < cameraIds.length; i += BATCH_SIZE) {
+          const batch = cameraIds.slice(i, i + BATCH_SIZE);
+          const batchResults = await Promise.allSettled(
+            batch.map((id) => cameraApi.startStream(id)),
+          );
+          results.push(...batchResults);
+
+          if (i + BATCH_SIZE < cameraIds.length) {
+            await new Promise((r) => setTimeout(r, 1000));
+          }
+        }
+
+        const succeeded = results.filter((r) => r.status === "fulfilled").length;
+        const failed = results.filter((r) => r.status === "rejected").length;
+
+        console.log(`✅ Started ${succeeded}, failed ${failed}`);
+
+        // Invalidate to refresh
+        await queryClient.invalidateQueries({ queryKey: cameraKeys.all });
+
+        return { succeeded, failed };
+      } catch (err) {
+        console.error("Bulk start error:", err);
+      }
+    },
+    [queryClient],
+  );
+
+  // ============================================
+  // HELPERS
+  // ============================================
+
+  const cameras = camerasQuery.data?.cameras || [];
+  const pagination = camerasQuery.data?.pagination || {
+    page: 1,
+    limit: 10,
+    total: 0,
+    pages: 0,
   };
 
-  // Fetch Stats
-  const fetchStats = async () => {
-    try {
-      const response = await cameraApi.getStats();
-      if (response?.success && isMounted.current) {
-        setStats(response.data);
-        return response.data;
-      }
-    } catch (err) {
-      console.error("Failed to fetch stats:", err);
-    }
-  };
-
-  // Fetch Stream Stats
-  const fetchStreamStats = async () => {
-    try {
-      const response = await cameraApi.getStreamDashboardStats();
-      if (response?.success && isMounted.current) {
-        setStreamStats(response.data);
-        return response.data;
-      }
-    } catch (err) {
-      console.error("Failed to fetch stream stats:", err);
-    }
-  };
-
-  // Toggle Status with optimistic update
-  const statusToggle = useCallback(async (id) => {
-    try {
-      // Find camera to update
-      const cameraToUpdate = cameras.find(cam => cam._id === id);
-      if (!cameraToUpdate) return;
-
-      // Calculate new status
-      const newStatus = cameraToUpdate.status === "active" ? "inactive" : "active";
-      const newStreamStatus = newStatus === "active" ? "online" : "offline";
-
-      // Optimistic update - update UI immediately
-      setCameras(prev => 
-        prev.map(cam => 
-          cam._id === id 
-            ? { ...cam, status: newStatus, streamStatus: newStreamStatus }
-            : cam
-        )
-      );
-
-      // Update stats optimistically
-      setStats(prev => {
-        if (!prev) return prev;
-        return {
-          ...prev,
-          active: newStatus === "active" ? (prev.active || 0) + 1 : (prev.active || 0) - 1,
-          inactive: newStatus === "inactive" ? (prev.inactive || 0) + 1 : (prev.inactive || 0) - 1,
-        };
-      });
-
-      // Make API call
-      const res = await cameraApi.toggleStatus(id);
-      
-      // If API returns different status, sync back
-      if (res?.data?.status !== newStatus) {
-        await fetchCameras();
-        await fetchStats();
-        await fetchStreamStats();
-      }
-
-      return res?.data?.status;
-    } catch (err) {
-      // Revert on error - fetch fresh data
-      await fetchCameras();
-      await fetchStats();
-      await fetchStreamStats();
-      
-      Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: "Failed to toggle camera status",
-        toast: true,
-        position: "top-end",
-        showConfirmButton: false,
-        timer: 3000,
-      });
-    }
-  }, [cameras, fetchCameras, fetchStats]);
-
-  /**
-   * ============================================
-   * STREAM MANAGEMENT FUNCTIONS
-   * ============================================
-   */
-
-  // Start stream
-  const startStream = useCallback(async (cameraId) => {
-    try {
-      setIsSubmitting(true);
-      const response = await cameraApi.startStream(cameraId);
-
-      if (response?.success) {
-        // Update camera in list
-        setCameras(prev => 
-          prev.map(cam => 
-            cam._id === cameraId 
-              ? { ...cam, hlsUrl: response.data.hlsUrl, isStreaming: true, streamStatus: 'streaming' }
-              : cam
-          )
-        );
-        
-        await fetchStreamStats();
-
-        Swal.fire({
-          icon: "success",
-          title: "Stream Started",
-          text: "Camera stream started successfully",
-          timer: 1500,
-          showConfirmButton: false,
-          toast: true,
-          position: "top-end",
-        });
-
-        return response.data;
-      }
-      return null;
-    } catch (err) {
-      Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: err.message || "Failed to start stream",
-      });
-      return null;
-    } finally {
-      setIsSubmitting(false);
-    }
-  }, []);
-
-  // Stop stream
-  const stopStream = useCallback(async (cameraId) => {
-    try {
-      setIsSubmitting(true);
-      const response = await cameraApi.stopStream(cameraId);
-
-      if (response?.success) {
-        // Update camera in list
-        setCameras(prev => 
-          prev.map(cam => 
-            cam._id === cameraId 
-              ? { ...cam, hlsUrl: null, isStreaming: false, streamStatus: 'stopped' }
-              : cam
-          )
-        );
-        
-        await fetchStreamStats();
-
-        Swal.fire({
-          icon: "info",
-          title: "Stream Stopped",
-          text: "Camera stream stopped successfully",
-          timer: 1500,
-          showConfirmButton: false,
-          toast: true,
-          position: "top-end",
-        });
-
-        return response.data;
-      }
-      return null;
-    } catch (err) {
-      Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: err.message || "Failed to stop stream",
-      });
-      return null;
-    } finally {
-      setIsSubmitting(false);
-    }
-  }, []);
-
-  // Restart stream
-  const restartStream = useCallback(async (cameraId) => {
-    try {
-      setIsSubmitting(true);
-      const response = await cameraApi.restartStream(cameraId);
-
-      if (response?.success) {
-        // Update camera in list
-        setCameras(prev => 
-          prev.map(cam => 
-            cam._id === cameraId 
-              ? { ...cam, hlsUrl: response.data.hlsUrl, isStreaming: true, streamStatus: 'streaming' }
-              : cam
-          )
-        );
-        
-        await fetchStreamStats();
-
-        Swal.fire({
-          icon: "success",
-          title: "Stream Restarted",
-          text: "Camera stream restarted successfully",
-          timer: 1500,
-          showConfirmButton: false,
-          toast: true,
-          position: "top-end",
-        });
-
-        return response.data;
-      }
-      return null;
-    } catch (err) {
-      Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: err.message || "Failed to restart stream",
-      });
-      return null;
-    } finally {
-      setIsSubmitting(false);
-    }
-  }, []);
-
-  // Get stream status
-  const getStreamStatus = useCallback(async (cameraId) => {
-    try {
-      const response = await cameraApi.getStreamStatus(cameraId);
-      if (response?.success) {
-        // Update camera in list
-        setCameras(prev => 
-          prev.map(cam => 
-            cam._id === cameraId 
-              ? { ...cam, ...response.data }
-              : cam
-          )
-        );
-        return response.data;
-      }
-      return null;
-    } catch (err) {
-      console.error("Failed to get stream status:", err);
-      return null;
-    }
-  }, []);
-
-  // Get all active streams
-  const fetchActiveStreams = useCallback(async () => {
-    try {
-      const response = await cameraApi.getActiveStreams();
-      if (response?.success) {
-        return response.data;
-      }
-      return null;
-    } catch (err) {
-      console.error("Failed to fetch active streams:", err);
-      return null;
-    }
-  }, []);
-
-  // Helper functions
-  const getOnlineCount = useCallback(() => 
-    cameras.filter((cam) => cam.streamStatus === "online").length, 
-    [cameras]
+  const getOnlineCount = useCallback(
+    () => cameras.filter((cam) => cam.streamStatus === "online").length,
+    [cameras],
   );
-  
-  const getOfflineCount = useCallback(() => 
-    cameras.filter((cam) => cam.streamStatus === "offline").length, 
-    [cameras]
+  const getOfflineCount = useCallback(
+    () => cameras.filter((cam) => cam.streamStatus === "offline").length,
+    [cameras],
   );
-  
-  const getActiveCount = useCallback(() => 
-    cameras.filter((cam) => cam.status === "active").length, 
-    [cameras]
+  const getActiveCount = useCallback(
+    () => cameras.filter((cam) => cam.status === "active").length,
+    [cameras],
   );
-  
-  const getInactiveCount = useCallback(() => 
-    cameras.filter((cam) => cam.status === "inactive").length, 
-    [cameras]
+  const getInactiveCount = useCallback(
+    () => cameras.filter((cam) => cam.status === "inactive").length,
+    [cameras],
+  );
+  const getStreamingCount = useCallback(
+    () => cameras.filter((cam) => cam.isStreaming).length,
+    [cameras],
   );
 
-  const getStreamingCount = useCallback(() => 
-    cameras.filter((cam) => cam.streamStatus === "streaming").length, 
-    [cameras]
-  );
+  // ============================================
+  // PARAMS CONTROL
+  // ============================================
+
+  const fetchCameras = useCallback(async (newParams = {}) => {
+    setParams((prev) => ({ ...prev, ...newParams }));
+    // React Query automatically refetches when params change
+    // No manual fetch needed
+    return null;
+  }, []);
+
+  const setFilters = useCallback((newFilters) => {
+    setParams((prev) => ({ ...prev, ...newFilters, page: 1 }));
+  }, []);
+
+  // Manual refresh helpers
+  const refreshData = useCallback(() => {
+    queryClient.invalidateQueries({ queryKey: cameraKeys.all });
+  }, [queryClient]);
+
+  const fetchStats = useCallback(() => {
+    return queryClient.invalidateQueries({ queryKey: cameraKeys.stats() });
+  }, [queryClient]);
+
+  const fetchStreamStats = useCallback(() => {
+    return queryClient.invalidateQueries({ queryKey: cameraKeys.streamStats() });
+  }, [queryClient]);
+
+  // ============================================
+  // RETURN
+  // ============================================
 
   return {
+    // Data (from React Query cache)
     cameras,
-    loading,
-    error,
-    isSubmitting,
     pagination,
-    filters,
-    stats,
-    streamStats,
+    stats: statsQuery.data || null,
+    streamStats: streamStatsQuery.data || null,
 
+    // Loading states
+    loading: camerasQuery.isLoading,               // Only initial load
+    isFetching: camerasQuery.isFetching,           // Any fetch (background)
+    isStatsLoading: statsQuery.isLoading,
+    isStreamStatsLoading: streamStatsQuery.isLoading,
+    isSubmitting,
+
+    // Errors
+    error: camerasQuery.error?.message || null,
+    statsError: statsQuery.error?.message || null,
+
+    // Refetch functions
+    fetchCameras,           // Updates params, auto-refetches
+    fetchStats,             // Manual refetch stats
+    fetchStreamStats,       // Manual refetch stream stats
+    refreshData,            // Invalidate all
+
+    // Filters
+    filters: params,
+    setFilters,
+
+    // CRUD
     addCamera,
     editCamera,
     removeCamera,
-    fetchCameras,
-    fetchStats,
-    fetchStreamStats,
     statusToggle,
-    
-    // Stream management functions
+
+    // Stream management
     startStream,
     stopStream,
     restartStream,
-    getStreamStatus,
-    fetchActiveStreams,
-    
-    // Helper functions
+    startAllStreams,
+
+    // Helpers
     getOnlineCount,
     getOfflineCount,
     getActiveCount,
     getInactiveCount,
     getStreamingCount,
-    refreshData,
+
+    // Mutation states (optional advanced usage)
+    isCreating: createMutation.isPending,
+    isUpdating: updateMutation.isPending,
+    isDeleting: deleteMutation.isPending,
   };
 };

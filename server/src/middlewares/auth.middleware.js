@@ -27,7 +27,6 @@ export const authenticate = asyncHandler(async (req, res, next) => {
   try {
     // 2. Verify token
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
     // 3. Check if user exists in database
     let user = null;
     let userType = decoded.type || "user";
@@ -75,7 +74,6 @@ export const authenticate = asyncHandler(async (req, res, next) => {
     if (process.env.NODE_ENV === "development") {
       logger.debug(`Authenticated user: ${user._id}`, { path: req.path, type: userType });
     }
-
     next();
   } catch (error) {
     if (error.name === "JsonWebTokenError") {

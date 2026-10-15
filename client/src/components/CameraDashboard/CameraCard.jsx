@@ -1,202 +1,697 @@
+// // frontend/src/components/CameraDashboard/CameraCard.jsx
+// import React, { useState, useRef, useEffect } from "react";
+// import {
+//   VideoOff,
+//   Power,
+//   Play,
+//   Square,
+//   Eye,
+//   Wifi,
+//   WifiOff,
+//   RefreshCw,
+//   Maximize2,
+//   Volume2,
+//   VolumeX,
+//   Camera as CameraIcon,
+//   MoreVertical,
+// } from "lucide-react";
+// import { LiveFeedVideo } from "@/pages/parent-portal/LiveFeed/LiveFeedVideo";
+// import { Button } from "@/components/ui/button";
+// import {
+//   DropdownMenu,
+//   DropdownMenuContent,
+//   DropdownMenuItem,
+//   DropdownMenuTrigger,
+// } from "@/components/ui/dropdown-menu";
+
+// export const CameraCard = ({
+//   camera,
+//   onView,
+//   onActivate,
+//   onStreamToggle,
+//   isStreamActive = false,
+// }) => {
+//   const [isHovered, setIsHovered] = useState(false);
+//   const [isMuted, setIsMuted] = useState(true);
+//   const [isAutoPlaying, setIsAutoPlaying] = useState(false);
+//   const videoContainerRef = useRef(null);
+//   const liveFeedRef = useRef(null);
+//   const autoPlayTimerRef = useRef(null);
+
+//   const isActive = camera.status === "active";
+//   const isOnline = camera.streamStatus === "online";
+//   const isStreaming = camera.isStreaming || isStreamActive;
+
+//   // 🔥 FIXED: Auto-play only ONCE per camera
+//   useEffect(() => {
+//     // Clear any existing timer
+//     if (autoPlayTimerRef.current) {
+//       clearTimeout(autoPlayTimerRef.current);
+//       autoPlayTimerRef.current = null;
+//     }
+
+//     // Only auto-play if:
+//     // 1. Camera is active
+//     // 2. Not already streaming
+//     // 3. Not already auto-playing
+//     // 4. Not already attempted
+//     if (isActive && !isStreaming && !isAutoPlaying && !camera._autoPlayed) {
+//       console.log(`🎯 Auto-playing camera: ${camera.name} (ID: ${camera._id})`);
+//       onStreamToggle(camera);
+//       // Mark as auto-played to prevent duplicates
+//       camera._autoPlayed = true;
+//       setIsAutoPlaying(true);
+
+//       // Add delay to prevent all cameras starting at once
+//       const delay = Math.random() * 1000 + 500; // 500-1500ms random delay
+
+//       autoPlayTimerRef.current = setTimeout(() => {
+//         onStreamToggle(camera);
+//         // Reset auto-play flag after 5 seconds
+//         setTimeout(() => {
+//           setIsAutoPlaying(false);
+//         }, 5000);
+//       }, delay);
+//     }
+
+//     return () => {
+//       if (autoPlayTimerRef.current) {
+//         clearTimeout(autoPlayTimerRef.current);
+//         autoPlayTimerRef.current = null;
+//       }
+//     };
+//   }, [camera._id, isActive, isStreaming]);
+
+//   // Get video element
+//   const getVideoElement = () => {
+//     if (liveFeedRef.current) {
+//       if (liveFeedRef.current.videoElement) {
+//         return liveFeedRef.current.videoElement;
+//       }
+//       const videoElement = videoContainerRef.current?.querySelector("video");
+//       if (videoElement) {
+//         return videoElement;
+//       }
+//     }
+//     return null;
+//   };
+
+//   // Screenshot functionality
+//   const handleScreenshot = () => {
+//     const video = getVideoElement();
+//     if (!video) {
+//       console.log("Video not available");
+//       return;
+//     }
+
+//     try {
+//       const canvas = document.createElement("canvas");
+//       canvas.width = video.videoWidth || 1280;
+//       canvas.height = video.videoHeight || 720;
+//       const ctx = canvas.getContext("2d");
+
+//       ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+//       ctx.fillStyle = "rgba(0,0,0,0.6)";
+//       ctx.fillRect(10, canvas.height - 40, 250, 30);
+//       ctx.fillStyle = "white";
+//       ctx.font = "12px Arial";
+//       ctx.fillText(
+//         `📷 ${camera.name} • ${new Date().toLocaleString()}`,
+//         20,
+//         canvas.height - 18,
+//       );
+
+//       const screenshot = canvas.toDataURL("image/png");
+//       const link = document.createElement("a");
+//       const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
+//       link.download = `screenshot-${camera.name}-${timestamp}.png`;
+//       link.href = screenshot;
+//       link.click();
+//     } catch (error) {
+//       console.error("Screenshot error:", error);
+//     }
+//   };
+
+//   // Fullscreen functionality
+//   const handleFullscreen = () => {
+//     const video = getVideoElement();
+//     if (!video) {
+//       console.log("Video not available");
+//       return;
+//     }
+
+//     try {
+//       if (video.requestFullscreen) {
+//         video.requestFullscreen();
+//       } else if (video.webkitRequestFullscreen) {
+//         video.webkitRequestFullscreen();
+//       } else if (video.mozRequestFullScreen) {
+//         video.mozRequestFullScreen();
+//       } else if (video.msRequestFullscreen) {
+//         video.msRequestFullscreen();
+//       }
+//     } catch (error) {
+//       console.error("Fullscreen error:", error);
+//     }
+//   };
+
+//   const getStatusBadge = () => {
+//     if (isStreaming) {
+//       return {
+//         label: "LIVE",
+//         color: "bg-red-500",
+//         dotColor: "bg-white animate-pulse",
+//         icon: <Wifi className="w-3 h-3 text-white" />,
+//       };
+//     } else if (isActive && isOnline) {
+//       return {
+//         label: "ONLINE",
+//         color: "bg-green-500",
+//         dotColor: "bg-white",
+//         icon: <Wifi className="w-3 h-3 text-white" />,
+//       };
+//     } else if (isActive && !isOnline) {
+//       return {
+//         label: "OFFLINE",
+//         color: "bg-yellow-500",
+//         dotColor: "bg-white",
+//         icon: <WifiOff className="w-3 h-3 text-white" />,
+//       };
+//     } else {
+//       return {
+//         label: "INACTIVE",
+//         color: "bg-gray-500",
+//         dotColor: "bg-white",
+//         icon: <Power className="w-3 h-3 text-white" />,
+//       };
+//     }
+//   };
+
+//   const status = getStatusBadge();
+
+//   return (
+//     <div className="bg-white rounded-2xl border border-slate-200/60 overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 hover:scale-[1.01]">
+//       {/* Video Preview */}
+//       <div
+//         ref={videoContainerRef}
+//         className="relative aspect-video bg-black cursor-pointer"
+//         onClick={() => onView(camera)}
+//       >
+//         {isActive ? (
+//           <LiveFeedVideo
+//             ref={liveFeedRef}
+//             child={camera}
+//             isPreview={true}
+//             showControls={false}
+//             className="rounded-none"
+//             autoPlay={true}
+//           />
+//         ) : (
+//           <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-slate-800 to-slate-900">
+//             <div className="text-center text-white/30">
+//               <VideoOff size={48} className="mx-auto mb-3 opacity-30" />
+//               <p className="text-sm font-medium">Camera Offline</p>
+//             </div>
+//           </div>
+//         )}
+
+//         {/* Status Badge */}
+//         <div
+//           className={`absolute top-3 left-3 flex items-center gap-2 px-3 py-1.5 rounded-full ${status.color} backdrop-blur-sm shadow-lg`}
+//         >
+//           <span className={`w-2 h-2 rounded-full ${status.dotColor}`}></span>
+//           <span className="text-white text-xs font-bold tracking-wider uppercase">
+//             {status.label}
+//           </span>
+//         </div>
+
+//         {/* Camera Name */}
+//         <div className="absolute bottom-3 left-3 bg-black/60 backdrop-blur-sm px-3 py-1.5 rounded-lg">
+//           <p className="text-white text-sm font-medium">{camera.name}</p>
+//         </div>
+
+//         {/* Live Time */}
+//         {isStreaming && (
+//           <div className="absolute bottom-3 right-3 bg-black/60 backdrop-blur-sm px-3 py-1.5 rounded-lg">
+//             <span className="text-white/80 text-[10px] font-mono">
+//               🟢 {new Date().toLocaleTimeString()}
+//             </span>
+//           </div>
+//         )}
+
+//         {/* Hover Overlay */}
+//         <div
+//           className={`absolute inset-0 bg-black/40 flex items-center justify-center transition-opacity duration-300 ${
+//             isHovered ? "opacity-100" : "opacity-0"
+//           }`}
+//         >
+//           <button
+//             onClick={(e) => {
+//               e.stopPropagation();
+//               onView(camera);
+//             }}
+//             className="px-6 py-3 bg-white/90 hover:bg-white text-slate-800 rounded-xl font-medium transition shadow-lg flex items-center gap-2"
+//           >
+//             <Eye className="w-5 h-5" />
+//             View Stream
+//           </button>
+//         </div>
+//       </div>
+
+//       {/* Controls */}
+//       <div className="p-4 bg-white border-t border-slate-100">
+//         <div className="flex items-center justify-between">
+//           {/* Left - Camera Info */}
+//           <div className="flex items-center gap-3">
+//             <div
+//               className={`w-2 h-2 rounded-full ${isActive ? "bg-green-500" : "bg-gray-300"}`}
+//             ></div>
+//             <div>
+//               <p className="text-sm font-semibold text-slate-800">
+//                 {camera.name}
+//               </p>
+//               <p className="text-xs text-slate-400">
+//                 {camera.class || "Camera"}
+//               </p>
+//             </div>
+//           </div>
+
+//           {/* Right - Controls */}
+//           <div className="flex items-center gap-1">
+//             {/* Start/Stop Stream */}
+//             <Button
+//               onClick={() => {
+//                 // Reset auto-play flag on manual toggle
+//                 camera._autoPlayed = false;
+//                 onStreamToggle(camera);
+//               }}
+//               variant={isStreaming ? "destructive" : "default"}
+//               size="sm"
+//               className={`rounded-xl transition-all duration-200 ${
+//                 isStreaming
+//                   ? "bg-red-500 hover:bg-red-600 shadow-red-500/30"
+//                   : "bg-blue-500 hover:bg-blue-600 shadow-blue-500/30"
+//               } shadow-lg`}
+//             >
+//               {isStreaming ? (
+//                 <>
+//                   <Square className="w-3.5 h-3.5 mr-1.5" />
+//                   Stop
+//                 </>
+//               ) : (
+//                 <>
+//                   <Play className="w-3.5 h-3.5 mr-1.5" />
+//                   Start
+//                 </>
+//               )}
+//             </Button>
+
+//             {/* Power Toggle */}
+//             <Button
+//               onClick={() => {
+//                 camera._autoPlayed = false;
+//                 onActivate(camera._id);
+//               }}
+//               variant={isActive ? "outline" : "default"}
+//               size="icon"
+//               className={`rounded-xl ${isActive ? "hover:bg-red-50 hover:text-red-600 hover:border-red-200" : "bg-green-500 hover:bg-green-600 text-white shadow-green-500/30 shadow-lg"}`}
+//             >
+//               <Power className="w-4 h-4" />
+//             </Button>
+
+//             {/* Fullscreen Button */}
+//             <Button
+//               onClick={handleFullscreen}
+//               variant="outline"
+//               size="icon"
+//               className="rounded-xl hover:bg-purple-50 hover:text-purple-600 hover:border-purple-200"
+//             >
+//               <Maximize2 className="w-4 h-4" />
+//             </Button>
+
+//             {/* More Options */}
+//             <DropdownMenu>
+//               <DropdownMenuTrigger asChild>
+//                 <Button variant="ghost" size="icon" className="rounded-xl">
+//                   <MoreVertical className="w-4 h-4" />
+//                 </Button>
+//               </DropdownMenuTrigger>
+//               <DropdownMenuContent align="end" className="w-52 rounded-xl">
+//                 <DropdownMenuItem onClick={handleScreenshot}>
+//                   <CameraIcon className="w-4 h-4 mr-2" />
+//                   Take Screenshot
+//                 </DropdownMenuItem>
+
+//                 <DropdownMenuItem onClick={handleFullscreen}>
+//                   <Maximize2 className="w-4 h-4 mr-2" />
+//                   Fullscreen
+//                 </DropdownMenuItem>
+
+//                 <DropdownMenuItem onClick={() => setIsMuted(!isMuted)}>
+//                   {isMuted ? (
+//                     <VolumeX className="w-4 h-4 mr-2" />
+//                   ) : (
+//                     <Volume2 className="w-4 h-4 mr-2" />
+//                   )}
+//                   {isMuted ? "Unmute" : "Mute"}
+//                 </DropdownMenuItem>
+
+//                 <DropdownMenuItem onClick={() => window.location.reload()}>
+//                   <RefreshCw className="w-4 h-4 mr-2" />
+//                   Refresh Stream
+//                 </DropdownMenuItem>
+
+//                 {camera.ipAddress && (
+//                   <DropdownMenuItem className="text-slate-400 text-xs border-t mt-1 pt-1">
+//                     IP: {camera.ipAddress}
+//                   </DropdownMenuItem>
+//                 )}
+//               </DropdownMenuContent>
+//             </DropdownMenu>
+//           </div>
+//         </div>
+//       </div>
+//     </div>
+//   );
+// };
+
+
+
+
+
+
+
+
 // frontend/src/components/CameraDashboard/CameraCard.jsx
-import React, { useState } from "react";
-import { 
-  VideoOff, 
-  Power, 
-  Play, 
+import React, { useState, useRef, useEffect } from "react";
+import {
+  VideoOff,
+  Power,
+  Play,
   Square,
-  MoreVertical,
   Eye,
+  Wifi,
+  WifiOff,
   RefreshCw,
-  Settings
+  Maximize2,
+  Volume2,
+  VolumeX,
+  Camera as CameraIcon,
+  MoreVertical,
+  Loader2,
 } from "lucide-react";
-import { 
+import { LiveFeedVideo } from "@/pages/parent-portal/LiveFeed/LiveFeedVideo";
+import { Button } from "@/components/ui/button";
+import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Badge } from "@/components/ui/badge";
-import { LiveFeedVideo } from "@/pages/parent-portal/LiveFeed/LiveFeedVideo";
 
-export const CameraCard = ({ camera, onView, onActivate, onStreamToggle }) => {
+export const CameraCard = ({
+  camera,
+  onView,
+  onActivate,
+  onStreamToggle,
+  isStreamActive = false,
+}) => {
   const [isHovered, setIsHovered] = useState(false);
+  const [isMuted, setIsMuted] = useState(true);
+  const videoContainerRef = useRef(null);
+  const liveFeedRef = useRef(null);
+
   const isActive = camera.status === "active";
   const isOnline = camera.streamStatus === "online";
-  const isStreaming = camera.isStreaming || false;
+  const isStreaming = camera.isStreaming || isStreamActive;
+  const isStarting = camera.isStarting && !isStreaming; // ✅ backend hint
+
+  // ✅ NO auto onStreamToggle — backend already starts stream.
+  //    Just mark for potential future use.
+  useEffect(() => {
+    // Intentionally empty — rely on backend auto-start
+  }, [camera._id]);
+
+  const getVideoElement = () => {
+    if (liveFeedRef.current) {
+      if (liveFeedRef.current.videoElement) {
+        return liveFeedRef.current.videoElement;
+      }
+      return videoContainerRef.current?.querySelector("video") || null;
+    }
+    return null;
+  };
+
+  const handleScreenshot = () => {
+    const video = getVideoElement();
+    if (!video) return;
+    try {
+      const canvas = document.createElement("canvas");
+      canvas.width = video.videoWidth || 1280;
+      canvas.height = video.videoHeight || 720;
+      const ctx = canvas.getContext("2d");
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = "rgba(0,0,0,0.6)";
+      ctx.fillRect(10, canvas.height - 40, 250, 30);
+      ctx.fillStyle = "white";
+      ctx.font = "12px Arial";
+      ctx.fillText(
+        `📷 ${camera.name} • ${new Date().toLocaleString()}`,
+        20,
+        canvas.height - 18,
+      );
+      const screenshot = canvas.toDataURL("image/png");
+      const link = document.createElement("a");
+      const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
+      link.download = `screenshot-${camera.name}-${timestamp}.png`;
+      link.href = screenshot;
+      link.click();
+    } catch (error) {
+      console.error("Screenshot error:", error);
+    }
+  };
+
+  const handleFullscreen = () => {
+    const video = getVideoElement();
+    if (!video) return;
+    try {
+      if (video.requestFullscreen) video.requestFullscreen();
+      else if (video.webkitRequestFullscreen) video.webkitRequestFullscreen();
+      else if (video.mozRequestFullScreen) video.mozRequestFullScreen();
+      else if (video.msRequestFullscreen) video.msRequestFullscreen();
+    } catch (error) {
+      console.error("Fullscreen error:", error);
+    }
+  };
 
   const getStatusBadge = () => {
-    if (isActive && isOnline) {
+    if (isStreaming) {
       return {
-        label: "Active • Online",
-        color: "bg-green-100 text-green-800 border-green-200",
-        dotColor: "bg-green-500 animate-pulse",
-      };
-    } else if (isActive && !isOnline) {
-      return {
-        label: "Active • Offline",
-        color: "bg-yellow-100 text-yellow-800 border-yellow-200",
-        dotColor: "bg-yellow-500",
-      };
-    } else {
-      return {
-        label: "Inactive",
-        color: "bg-gray-100 text-gray-600 border-gray-200",
-        dotColor: "bg-gray-400",
+        label: "LIVE",
+        color: "bg-red-500",
+        dotColor: "bg-white animate-pulse",
       };
     }
+    if (isStarting) {
+      return {
+        label: "STARTING",
+        color: "bg-blue-500",
+        dotColor: "bg-white animate-pulse",
+      };
+    }
+    if (isActive && isOnline) {
+      return { label: "ONLINE", color: "bg-green-500", dotColor: "bg-white" };
+    }
+    if (isActive && !isOnline) {
+      return { label: "OFFLINE", color: "bg-yellow-500", dotColor: "bg-white" };
+    }
+    return { label: "INACTIVE", color: "bg-gray-500", dotColor: "bg-white" };
   };
 
   const status = getStatusBadge();
 
   return (
-    <div
-      className="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-    >
+    <div className="bg-white rounded-2xl border border-slate-200/60 overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 hover:scale-[1.01]">
       {/* Video Preview */}
-      <div className="relative aspect-video bg-black cursor-pointer" onClick={() => onView(camera)}>
+      <div
+        ref={videoContainerRef}
+        className="relative aspect-video bg-black cursor-pointer"
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+        onClick={() => onView(camera)}
+      >
         {isActive ? (
           <LiveFeedVideo
-            child={camera} 
-            isPreview={true} 
+            ref={liveFeedRef}
+            child={camera}
+            isPreview={true}
             showControls={false}
             className="rounded-none"
+            autoPlay={true}
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-slate-800 to-slate-900">
-            <div className="text-center text-white/50">
-              <VideoOff size={40} className="mx-auto mb-2 opacity-50" />
+            <div className="text-center text-white/30">
+              <VideoOff size={48} className="mx-auto mb-3 opacity-30" />
               <p className="text-sm font-medium">Camera Offline</p>
             </div>
           </div>
         )}
 
         {/* Status Badge */}
-        <div className="absolute top-2 left-2">
-          <div
-            className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border ${status.color} backdrop-blur-sm bg-opacity-90 shadow-sm`}
-          >
-            <span className={`w-1.5 h-1.5 rounded-full ${status.dotColor}`}></span>
+        <div
+          className={`absolute top-3 left-3 flex items-center gap-2 px-3 py-1.5 rounded-full ${status.color} backdrop-blur-sm shadow-lg`}
+        >
+          <span className={`w-2 h-2 rounded-full ${status.dotColor}`}></span>
+          <span className="text-white text-xs font-bold tracking-wider uppercase">
             {status.label}
-          </div>
+          </span>
         </div>
 
-        {/* Stream Indicator */}
+        {/* Camera Name */}
+        <div className="absolute bottom-3 left-3 bg-black/60 backdrop-blur-sm px-3 py-1.5 rounded-lg">
+          <p className="text-white text-sm font-medium">{camera.name}</p>
+        </div>
+
+        {/* Live Time */}
         {isStreaming && (
-          <div className="absolute top-2 right-2">
-            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border bg-red-500/90 text-white border-red-600 backdrop-blur-sm shadow-lg shadow-red-500/20">
-              <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span>
-              LIVE
-            </div>
+          <div className="absolute bottom-3 right-3 bg-black/60 backdrop-blur-sm px-3 py-1.5 rounded-lg">
+            <span className="text-white/80 text-[10px] font-mono">
+              🟢 {new Date().toLocaleTimeString()}
+            </span>
           </div>
         )}
 
-        {/* Quick Action Overlay */}
+        {/* Starting overlay */}
+        {isStarting && (
+          <div className="absolute top-3 right-3 flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-500/90 backdrop-blur-sm shadow-lg">
+            <Loader2 className="w-3 h-3 text-white animate-spin" />
+            <span className="text-white text-xs font-bold tracking-wider uppercase">
+              Starting
+            </span>
+          </div>
+        )}
+
+        {/* Hover Overlay */}
         <div
-          className={`absolute inset-0 bg-black/50 flex items-center justify-center gap-2 transition-opacity duration-300 ${
+          className={`absolute inset-0 bg-black/40 flex items-center justify-center transition-opacity duration-300 ${
             isHovered ? "opacity-100" : "opacity-0"
           }`}
         >
           <button
-            onClick={(e) => { e.stopPropagation(); onView(camera); }}
-            className="px-4 py-2 bg-white text-slate-800 rounded-lg font-medium hover:bg-slate-100 transition shadow-lg flex items-center gap-2"
+            onClick={(e) => {
+              e.stopPropagation();
+              onView(camera);
+            }}
+            className="px-6 py-3 bg-white/90 hover:bg-white text-slate-800 rounded-xl font-medium transition shadow-lg flex items-center gap-2"
           >
-            <Eye className="w-4 h-4" />
-            View
+            <Eye className="w-5 h-5" />
+            View Stream
           </button>
-          <button
-            onClick={(e) => { e.stopPropagation(); onActivate(camera._id); }}
-            className={`px-4 py-2 rounded-lg font-medium transition shadow-lg flex items-center gap-2 ${
-              isActive
-                ? "bg-red-500 hover:bg-red-600 text-white"
-                : "bg-green-500 hover:bg-green-600 text-white"
-            }`}
-          >
-            <Power className="w-4 h-4" />
-            {isActive ? "Deactivate" : "Activate"}
-          </button>
-          {isActive && (
-            <button
-              onClick={(e) => { e.stopPropagation(); onStreamToggle(camera); }}
-              className={`px-4 py-2 rounded-lg font-medium transition shadow-lg flex items-center gap-2 ${
-                isStreaming
-                  ? "bg-yellow-500 hover:bg-yellow-600 text-white"
-                  : "bg-blue-500 hover:bg-blue-600 text-white"
-              }`}
-            >
-              {isStreaming ? <Square className="w-4 h-4" /> : <Play className="w-4 h-4" />}
-              {isStreaming ? "Stop" : "Start"}
-            </button>
-          )}
         </div>
       </div>
 
-      {/* Camera Info */}
-      <div className="p-3">
+      {/* Controls */}
+      <div className="p-4 bg-white border-t border-slate-100">
         <div className="flex items-center justify-between">
-          <div className="flex-1 min-w-0">
-            <h4 className="font-semibold text-slate-800 text-sm truncate">{camera.name}</h4>
-            <div className="flex items-center gap-2 mt-0.5">
-              <p className="text-xs text-slate-500 truncate">{camera.class}</p>
-              {camera.location && (
-                <>
-                  <span className="w-0.5 h-0.5 bg-slate-300 rounded-full"></span>
-                  <p className="text-xs text-slate-400 truncate">{camera.location}</p>
-                </>
-              )}
+          <div className="flex items-center gap-3">
+            <div
+              className={`w-2 h-2 rounded-full ${isActive ? "bg-green-500" : "bg-gray-300"}`}
+            ></div>
+            <div>
+              <p className="text-sm font-semibold text-slate-800">
+                {camera.name}
+              </p>
+              <p className="text-xs text-slate-400">
+                {camera.class || "Camera"}
+              </p>
             </div>
           </div>
-          <div className="flex items-center gap-1 ml-2">
-            <div className={`w-2 h-2 rounded-full ${isActive ? 'bg-green-500' : 'bg-gray-300'}`}></div>
-            <span className="text-[10px] text-slate-500 font-medium">
-              {isActive ? 'Active' : 'Inactive'}
-            </span>
+
+          <div className="flex items-center gap-1">
+            {/* ✅ Manual Start/Stop — real user action */}
+            <Button
+              onClick={() => onStreamToggle(camera)}
+              variant={isStreaming ? "destructive" : "default"}
+              size="sm"
+              disabled={!isActive}
+              className={`rounded-xl transition-all duration-200 ${
+                isStreaming
+                  ? "bg-red-500 hover:bg-red-600 shadow-red-500/30"
+                  : "bg-blue-500 hover:bg-blue-600 shadow-blue-500/30"
+              } shadow-lg disabled:opacity-50`}
+            >
+              {isStreaming ? (
+                <>
+                  <Square className="w-3.5 h-3.5 mr-1.5" />
+                  Stop
+                </>
+              ) : (
+                <>
+                  <Play className="w-3.5 h-3.5 mr-1.5" />
+                  Start
+                </>
+              )}
+            </Button>
+
+            <Button
+              onClick={() => onActivate(camera._id)}
+              variant={isActive ? "outline" : "default"}
+              size="icon"
+              className={`rounded-xl ${
+                isActive
+                  ? "hover:bg-red-50 hover:text-red-600 hover:border-red-200"
+                  : "bg-green-500 hover:bg-green-600 text-white shadow-green-500/30 shadow-lg"
+              }`}
+            >
+              <Power className="w-4 h-4" />
+            </Button>
+
+            <Button
+              onClick={handleFullscreen}
+              variant="outline"
+              size="icon"
+              className="rounded-xl hover:bg-purple-50 hover:text-purple-600 hover:border-purple-200"
+            >
+              <Maximize2 className="w-4 h-4" />
+            </Button>
+
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon" className="rounded-xl">
+                  <MoreVertical className="w-4 h-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-52 rounded-xl">
+                <DropdownMenuItem onClick={handleScreenshot}>
+                  <CameraIcon className="w-4 h-4 mr-2" />
+                  Take Screenshot
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={handleFullscreen}>
+                  <Maximize2 className="w-4 h-4 mr-2" />
+                  Fullscreen
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setIsMuted(!isMuted)}>
+                  {isMuted ? (
+                    <VolumeX className="w-4 h-4 mr-2" />
+                  ) : (
+                    <Volume2 className="w-4 h-4 mr-2" />
+                  )}
+                  {isMuted ? "Unmute" : "Mute"}
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => window.location.reload()}>
+                  <RefreshCw className="w-4 h-4 mr-2" />
+                  Refresh Stream
+                </DropdownMenuItem>
+                {camera.ipAddress && (
+                  <DropdownMenuItem className="text-slate-400 text-xs border-t mt-1 pt-1">
+                    IP: {camera.ipAddress}
+                  </DropdownMenuItem>
+                )}
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
-        </div>
-        
-        {/* Additional Info */}
-        <div className="flex items-center justify-between mt-2 pt-2 border-t border-slate-100">
-          <div className="flex items-center gap-3">
-            {camera.resolution && (
-              <span className="text-[10px] text-slate-400 bg-slate-100 px-2 py-0.5 rounded">
-                {camera.resolution}
-              </span>
-            )}
-            {camera.fps && (
-              <span className="text-[10px] text-slate-400 bg-slate-100 px-2 py-0.5 rounded">
-                {camera.fps} FPS
-              </span>
-            )}
-          </div>
-          
-          {/* More Actions */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <button className="p-1 hover:bg-slate-100 rounded-lg transition">
-                <MoreVertical className="w-4 h-4 text-slate-400" />
-              </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-40">
-              <DropdownMenuItem onClick={() => onView(camera)}>
-                <Eye className="w-4 h-4 mr-2" />
-                View Details
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => onActivate(camera._id)}>
-                <Power className="w-4 h-4 mr-2" />
-                {isActive ? 'Deactivate' : 'Activate'}
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => onStreamToggle(camera)}>
-                {isStreaming ? <Square className="w-4 h-4 mr-2" /> : <Play className="w-4 h-4 mr-2" />}
-                {isStreaming ? 'Stop Stream' : 'Start Stream'}
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <Settings className="w-4 h-4 mr-2" />
-                Settings
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
         </div>
       </div>
     </div>

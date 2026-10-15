@@ -29,6 +29,10 @@ import {
   getStreamDashboardStats,
   clientDisconnected,
   cleanupInactiveStreams,
+  getDetectionStatus,
+  getAllDetectionStatus,
+  toggleDetection,
+  testDetection,
 } from "../controllers/camera.controller.js";
 import {
   createCameraValidation,
@@ -126,7 +130,30 @@ router.get('/streams/dashboard-stats', getStreamDashboardStats);
 router.get('/streams/summary', getStreamSummary);
 router.post('/streams/client-disconnect', clientDisconnected);
 
+// ✅ Detection routes (NEW)
+router.get(
+  "/:cameraId/detection/status",
+  authenticate,
+  getDetectionStatus,
+);
 
+router.get(
+  "/detection/all",
+  authenticate,
+  getAllDetectionStatus,
+);
+
+router.patch(
+  "/:cameraId/detection/toggle",
+  authenticate,
+  toggleDetection,
+);
+
+router.post(
+  "/:cameraId/detection/test",
+  authenticate,
+  testDetection,
+);
 // rtsp://chinamdvr.com:6604/3/3?AVType=1&jsession=de2301e074af4234b6537c1f793fbb88&DevIDNO=018270236711&Channel=0&Stream=1
 
 

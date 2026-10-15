@@ -1,0 +1,47 @@
+version: "3.9"
+
+services:
+  detector:
+    build: ./server/detector-ai
+    restart: unless-stopped
+    environment:
+      DETECTOR_HOST: 0.0.0.0
+      DETECTOR_PORT: 8765
+      DETECTOR_PERSON_MODEL: /models/yolo11n.pt
+      DETECTOR_FIRE_MODEL: /models/fire_smoke_yolo.pt
+      DETECTOR_SNAPSHOT_DIR: /snapshots
+    volumes:
+      - ./models:/models:ro          # models bahar se
+      - snapshots:/snapshots
+    ports:
+      - "8765:8765"
+    # GPU chahiye to:
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: 1
+    #           capabilities: [gpu]
+
+  backend:
+    build: ./server
+    restart: unless-stopped
+    depends_on:
+      - detector
+    environment:
+      DETECTOR_WS_URL: ws://detector:8765    # ✅ service name se
+      MONGO_URI: mongodb://mongo:27017/cctv
+      NODE_ENV: production
+    ports:
+      - "5000:5000"
+
+  mongo:
+    image: mongo:7
+    restart: unless-stopped
+    volumes:
+      - mongo-data:/data/db
+
+volumes:
+  snapshots:
+  mongo-data:

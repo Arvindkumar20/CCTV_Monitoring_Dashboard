@@ -8,6 +8,9 @@ import { CreateAccount } from "@/pages/CreateAccount";
 import GuardianDetails from "@/adminDashboard/guardian/GuardianDetails";
 import { Loader2 } from "lucide-react";
 import { CameraDashboard } from "@/pages/CameraDashboard";
+import NotificationBell from "@/components/NotificationBell";
+import { useAuth } from "@/hooks/useAuth";
+import Alerts from "@/pages/AlertsPage";
 
 // Lazy imports
 const AdminDashboard = lazy(() => import("../pages/AdminDashboard"));
@@ -28,6 +31,8 @@ const SystemSettings = lazy(() => import("../pages/SystemSettings"));
 const ActivityLogs = lazy(() => import("../pages/ActivityLogs"));
 
 const AppRoutes = () => {
+  const { user } = useAuth();
+  console.log(user);
   return (
     <Suspense
       fallback={
@@ -39,6 +44,7 @@ const AppRoutes = () => {
         </div>
       }
     >
+      {/* <NotificationBell user={user} token={"user.token"} /> */}
       <Routes>
         {/* ================= PUBLIC ROUTES ================= */}
         <Route path="/" element={<LandingPage />} />
@@ -61,7 +67,14 @@ const AppRoutes = () => {
             </ProtectedRoute>
           }
         />
-
+        <Route
+          path="/dashboard/alerts"
+          element={
+            <ProtectedRoute>
+              <Alerts />
+            </ProtectedRoute>
+          }
+        />
         <Route
           path="/dashboard/categories"
           element={
